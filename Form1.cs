@@ -98,6 +98,7 @@ namespace DVISApi
 			catch (Exception exception)
 			{
 				OnMessage(string.Format("Error creating directory {0}: {1}", outputDir, exception));
+				return;
 			}
 
 			double hours;
