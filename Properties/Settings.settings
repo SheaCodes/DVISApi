@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DVISApiConsumption.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DVISApi.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="OutputDirectory" Type="System.String" Scope="User">
@@ -11,11 +11,20 @@
     <Setting Name="Server" Type="System.String" Scope="User">
       <Value Profile="(Default)">BHW-SP-CC1DVIS</Value>
     </Setting>
-    <Setting Name="Hours" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
+    <Setting Name="EndTime" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">2020-02-02</Value>
     </Setting>
     <Setting Name="StartTime" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">2020-02-01</Value>
+    </Setting>
+    <Setting Name="Signal" Type="System.String" Scope="User">
+      <Value Profile="(Default)">sim tag</Value>
+    </Setting>
+    <Setting Name="Port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5123</Value>
+    </Setting>
+    <Setting Name="CombineCSVs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

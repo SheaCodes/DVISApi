@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -25,15 +27,27 @@ namespace DVISApi
 			string server = settings.Server;
 			string inputFile = settings.InputFile;
 			string outputDir = settings.OutputDirectory;
-			double hours = settings.Hours;
+			
+
 			DateTime dtStart = settings.StartTime;
+			DateTime dtEnd = settings.EndTime;
+
+			string signal = settings.Signal;
 
 			textBoxServer.Text = server;
+			textBoxPort.Text = settings.Port.ToString();
 			textBoxOutputDir.Text = outputDir;
 			textBoxInputFile.Text = inputFile;
-			textBoxDuration.Text = hours.ToString();
+			
 			if(dtStart != DateTime.MinValue)
 				dateTimePickerStart.Value = dtStart;
+
+			if (dtEnd != DateTime.MinValue)
+				dateTimePickerEnd.Value = dtEnd;
+
+			textBoxSignal.Text = signal;
+
+			checkBoxCombineCSVs.Checked = settings.CombineCSVs;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -101,25 +115,25 @@ namespace DVISApi
 				return;
 			}
 
-			double hours;
-			if (!TryGetHours(out hours))
+			int port;
+			if (!TryGetPort(out port))
 			{
-				OnMessage(string.Format("Can not parse: {0} as number", textBoxDuration.Text));
-				return;
-			}
-
-			if (hours <= 0d)
-			{
-				OnMessage(string.Format("Hours ({0}) must be > 0", hours));
+				OnMessage(string.Format("Can not get port: {0}", textBoxPort.Text));
 				return;
 			}
 
 			DateTime dtStartLocal = dateTimePickerStart.Value;
-			DateTime dtEndLocal = dtStartLocal.AddHours(hours);
+			DateTime dtEndLocal = dateTimePickerEnd.Value;
 
 			if (dtStartLocal > DateTime.Now)
 			{
 				OnMessage("Start is later than now");
+				return;
+			}
+
+			if (dtStartLocal > dtEndLocal)
+			{
+				OnMessage("Start is later than end");
 				return;
 			}
 
@@ -128,65 +142,14 @@ namespace DVISApi
 			buttonGo.Enabled     = false;
 			buttonCancel.Enabled = true;
 
+			bool oneFile = checkBoxCombineCSVs.Checked;
+
 			ThreadPool.QueueUserWorkItem(delegate
 			{
-				try
-				{
-					TimeSpan tsBatchSize = TimeSpan.FromHours(4);
-
-					var lines = File.ReadAllLines(signalFile);
-					int todo = lines.Length;
-
-					int batchesPerSignal = (int)((dtEndLocal - dtStartLocal).TotalSeconds / tsBatchSize.TotalSeconds) + 1;
-					int totalBatches = batchesPerSignal * todo;
-
-					int batchesComplete = 0;
-					int signalsComplete = 0;
-
-					foreach (string line in lines)
-					{
-						string signalName = line.Trim();
-
-						Action onBatchComplete = delegate
-						{
-							batchesComplete++;
-							int progress = (int)Math.Round(100d * batchesComplete / totalBatches);
-							UpdateProgress(progress);
-						};
-
-						DateTime dtStartUtc = dtStartLocal.ToUniversalTime();
-						DateTime dtEndUtc = dtEndLocal.ToUniversalTime();
-						List<TSPointWeb> points = DoBatchedRequest(server, signalName, dtStartUtc, dtEndUtc, tsBatchSize, onBatchComplete);
-						if (_cancel)
-						{
-							OnMessage("Cancelled");
-							return;
-						}
-
-						if (points != null)
-							WriteCSV(outputDir, signalName, dtStartLocal, dtEndLocal, points);
-						signalsComplete++;
-
-						OnMessage("To do: " + (todo - signalsComplete));
-
-					}
-					UpdateProgress(100);
-
-				}
-				catch (Exception ex)
-				{
-					OnMessage(string.Format("Problem: {0}", ex));
-				}
-				finally
-				{
-					Thread.Sleep(2000);
-					UpdateProgress(0);
-					BeginInvoke((MethodInvoker) delegate
-					{
-						buttonGo.Enabled     = true;
-						buttonCancel.Enabled = false;
-					});
-				}
+				if (oneFile)
+					ExportArrayOneFile(signalFile, dtEndLocal, dtStartLocal, server, port, outputDir);
+				else
+					ExportArrayMultipleFiles(signalFile, dtEndLocal, dtStartLocal, server, port, outputDir);
 			});
 		}
 
@@ -196,18 +159,301 @@ namespace DVISApi
 			_cancel = true;
 		}
 
-		private static string CreateRequestString(string host, int port, string signal, DateTime dtStart, DateTime dtEnd)
+		private void OnClickReadCurrentValue(object sender, EventArgs e)
 		{
-			return string.Format("http://{0}:{1}/api/dvis/signalData?signal={2}&dateStart={3:s}&dateEnd={4:s}", host, port, signal.Replace(" ", "%20"), dtStart, dtEnd);
+			var server = textBoxServer.Text;
+			var signal = textBoxSignal.Text;
+
+			if(string.IsNullOrEmpty(server))
+			{
+				OnMessage("Server is not set");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(signal))
+			{
+				OnMessage("Signal is not set");
+				return;
+			}
+
+			int port;
+			if(!TryGetPort(out port))
+			{
+				OnMessage(string.Format("Can not get port: {0}", textBoxPort.Text));
+				return;
+			}
+
+			SaveSettings();
+
+			ThreadPool.QueueUserWorkItem(delegate
+			{
+				TSPointWeb point = ReadPoint(server, port, signal, DateTime.UtcNow + TimeSpan.FromMinutes(1));
+				if (point != null)
+				{
+					var o = point.ValueObject;
+					if(o is double)
+						OnMessage(string.Format("{0:hh:mm:ss.fff} {1:F2}", point.TimeStamp, (double)o));
+					else
+						OnMessage(string.Format("{0:hh:mm:ss.fff} {1:F2}", point.TimeStamp, o));
+				}
+				else
+				{
+					OnMessage("Point is null");
+				}
+			});
 		}
 
-		private List<TSPointWeb> DoBatchedRequest(string server, string signal, DateTime dtStartUtc, DateTime dtEndUtc, TimeSpan tsBatchSize, Action onBatchComplete)
+		private void ExportArrayOneFile(string signalFile, DateTime dtEndLocal, DateTime dtStartLocal, string server, int port, string outputDir)
 		{
 			try
 			{
-				List<TSPointWeb> points = new List<TSPointWeb>();
-				
+				TimeSpan tsBatchSize = TimeSpan.FromHours(4);
 
+				var signals = File.ReadAllLines(signalFile);
+				int todo = signals.Length;
+
+				int batchesPerSignal = (int)((dtEndLocal - dtStartLocal).TotalSeconds / tsBatchSize.TotalSeconds) + 1;
+				int totalBatches = batchesPerSignal * todo;
+
+				int batchesComplete = 0;
+				int signalsComplete = 0;
+
+				Dictionary<string, List<TSPointWeb>> dic = new Dictionary<string, List<TSPointWeb>>();
+
+				DateTime dtStartUtc = dtStartLocal.ToUniversalTime();
+				DateTime dtEndUtc = dtEndLocal.ToUniversalTime();
+
+
+				foreach (string signal in signals)
+				{
+					string signalName = signal.Trim();
+
+					Action onBatchComplete = delegate
+					{
+						batchesComplete++;
+						int progress = (int)Math.Round(100d * batchesComplete / totalBatches);
+						UpdateProgress(progress);
+					};
+
+					List<TSPointWeb> points = new List<TSPointWeb>();
+
+
+					var firstPoint = ReadPoint(server, port, signalName, dtStartLocal);
+					if (firstPoint != null)
+					{
+						points.Add(firstPoint);
+					}
+
+					bool success = ExportArrayBatchedRequest(server, port, signalName, dtStartUtc, dtEndUtc, tsBatchSize, points, onBatchComplete);
+					if (_cancel)
+					{
+						OnMessage("Cancelled");
+						return;
+					}
+
+					if(success)
+						dic.Add(signalName, points);
+
+					signalsComplete++;
+
+					OnMessage("To do: " + (todo - signalsComplete));
+				}
+
+				if (dic.Any())
+				{
+					ExportArrayOneFileCombine(dic, dtStartUtc, dtEndUtc, outputDir);
+				}
+
+				UpdateProgress(100);
+			}
+			catch (Exception ex)
+			{
+				OnMessage(string.Format("Problem: {0}", ex));
+			}
+			finally
+			{
+				Thread.Sleep(2000);
+				UpdateProgress(0);
+				BeginInvoke((MethodInvoker)delegate
+				{
+					buttonGo.Enabled     = true;
+					buttonCancel.Enabled = false;
+				});
+			}
+		}
+
+		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> sigToPointsBlah, DateTime dtStartUTC, DateTime dtEndUTC, string dir)
+		{
+			int[] options = {100, 250, 500, 750, 1000};
+
+			int best = options.Last();
+
+			Dictionary<string, TSPointWebIterator> sigToPoints = new Dictionary<string, TSPointWebIterator>();
+			foreach (var kvp in sigToPointsBlah)
+			{
+				sigToPoints.Add(kvp.Key, new TSPointWebIterator(kvp.Value));
+			}
+
+			foreach (var signal in sigToPoints)
+			{
+				var list = signal.Value;
+				double sum = 0d;
+				int count = 0;
+				for (int i = 2; i < 10 && i < list.Count; i++)
+				{
+					sum += Math.Round((list[i].TimeStamp - list[i - 1].TimeStamp).TotalMilliseconds);
+					count++;
+				}
+
+				int avg = (int) Math.Round(sum / count);
+				int closest = options.Last();
+				for (int i = 0; i < options.Length; i++)
+				{
+					if (Math.Abs(avg - options[i]) < Math.Abs(avg - closest))
+					{
+						closest = options[i];
+					}
+				}
+
+				if (closest < best)
+					best = closest;
+			}
+
+			TimeSpan tsAdvance = TimeSpan.FromMilliseconds(best);
+
+			OnMessage(string.Format("Using {0} ms", best));
+
+			DateTime dtCur = dtStartUTC;
+			if (!dir.EndsWith("\\"))
+				dir = dir + "\\";
+
+			string outputFile = string.Format(@"{0} {1:yyyy_MM_dd HHmm} {2:yyyy_MM_dd HHmm}.csv", dir, dtStartUTC, dtEndUTC);
+
+			if (!Directory.Exists(dir))
+				Directory.CreateDirectory(dir);
+
+			if (File.Exists(outputFile))
+			{
+				OnMessage("Deleting " + outputFile);
+				File.Delete(outputFile);
+			}
+
+			List<string> signalNames = sigToPoints.Keys.ToList();
+
+			using (var fs = File.OpenWrite(outputFile))
+			{
+				using (StreamWriter sw = new StreamWriter(fs))
+				{
+					sw.Write("Time,");
+
+					for (var index = 0; index < signalNames.Count; index++)
+					{
+						string signalName = signalNames[index];
+						var isLast = index == signalNames.Count - 1;
+						var post = isLast ? Environment.NewLine : ",";
+						sw.Write(signalName + post);
+					}
+
+					while (true)
+					{
+						sw.Write("{0:O},", dtCur);
+
+						for (var index = 0; index < signalNames.Count; index++)
+						{
+							string signalName = signalNames[index];
+							var isLast = index == signalNames.Count - 1;
+							var post = isLast ? Environment.NewLine : ",";
+							var point = sigToPoints[signalName].Get(dtCur);
+							if (point == null)
+								sw.Write(post);
+							else
+								sw.Write("{0}{1}", point.ValueObject, post);
+						}
+
+						dtCur += tsAdvance;
+						if (dtCur > dtEndUTC)
+							break;
+					}
+
+					sw.Flush();
+					sw.Close();
+				}
+			}
+		}
+
+		private void ExportArrayMultipleFiles(string signalFile, DateTime dtEndLocal, DateTime dtStartLocal, string server, int port, string outputDir)
+		{
+			try
+			{
+				TimeSpan tsBatchSize = TimeSpan.FromHours(4);
+
+				var signals = File.ReadAllLines(signalFile);
+				int todo = signals.Length;
+
+				int batchesPerSignal = (int) ((dtEndLocal - dtStartLocal).TotalSeconds / tsBatchSize.TotalSeconds) + 1;
+				int totalBatches = batchesPerSignal * todo;
+
+				int batchesComplete = 0;
+				int signalsComplete = 0;
+
+				foreach (string signal in signals)
+				{
+					string signalName = signal.Trim();
+
+					Action onBatchComplete = delegate
+					{
+						batchesComplete++;
+						int progress = (int) Math.Round(100d * batchesComplete / totalBatches);
+						UpdateProgress(progress);
+					};
+
+					List<TSPointWeb> points = new List<TSPointWeb>();
+
+					DateTime dtStartUtc = dtStartLocal.ToUniversalTime();
+					DateTime dtEndUtc = dtEndLocal.ToUniversalTime();
+
+					var firstPoint = ReadPoint(server, port, signalName, dtStartLocal);
+					if (firstPoint != null)
+					{
+						points.Add(firstPoint);
+					}
+
+					bool success = ExportArrayBatchedRequest(server, port, signalName, dtStartUtc, dtEndUtc, tsBatchSize, points, onBatchComplete);
+					if (_cancel)
+					{
+						OnMessage("Cancelled");
+						return;
+					}
+
+					if (success)
+						WriteCSV(outputDir, signalName, dtStartLocal, dtEndLocal, points);
+					signalsComplete++;
+
+					OnMessage("To do: " + (todo - signalsComplete));
+				}
+
+				UpdateProgress(100);
+			}
+			catch (Exception ex)
+			{
+				OnMessage(string.Format("Problem: {0}", ex));
+			}
+			finally
+			{
+				Thread.Sleep(2000);
+				UpdateProgress(0);
+				BeginInvoke((MethodInvoker) delegate
+				{
+					buttonGo.Enabled     = true;
+					buttonCancel.Enabled = false;
+				});
+			}
+		}
+
+		private bool ExportArrayBatchedRequest(string server, int port, string signal, DateTime dtStartUtc, DateTime dtEndUtc, TimeSpan tsBatchSize, List<TSPointWeb> addTo, Action onBatchComplete)
+		{
+			try
+			{
 				DateTime dtBatchStart = dtStartUtc;
 				DateTime dtBatchEnd = dtBatchStart + tsBatchSize;
 
@@ -216,8 +462,8 @@ namespace DVISApi
 					DateTime dtReqStart = dtBatchStart;
 					DateTime dtReqEnd = dtBatchEnd > dtEndUtc ? dtEndUtc : dtBatchEnd;
 
-					if (!DoRequest(server, signal, dtReqStart, dtReqEnd, points))
-						return null;
+					if (!ExportArrayReadArray(server, port, signal, dtReqStart, dtReqEnd, addTo))
+						return false;
 
 					if (onBatchComplete != null)
 						onBatchComplete();
@@ -228,33 +474,38 @@ namespace DVISApi
 					if (_cancel)
 					{
 						OnMessage("Cancel request acknowledged");
-						return null;
+						return false;
 					}
 
 					dtBatchStart = dtBatchEnd;
 					dtBatchEnd   = dtBatchStart + tsBatchSize;
 				}
 
-				return points;
+				return true;
 			}
 			catch (Exception e)
 			{
 				OnMessage(string.Format("Error {0}: {1}", signal, e));
+				return false;
 			}
-
-			return null;
 		}
 
-		private bool DoRequest(string server, string signal, DateTime dtReqStart, DateTime dtReqEnd, List<TSPointWeb> points)
+		private bool ExportArrayReadArray(string server, int port, string signal, DateTime dtStart, DateTime dtEnd, List<TSPointWeb> addTo)
 		{
 			WebClient webClient = new WebClient();
 
-			string reqStr = CreateRequestString(server, 5123, signal, dtReqStart, dtReqEnd);
+			string reqStr = CreateRequestArray(server, port, signal, dtStart, dtEnd);
 			string json = webClient.DownloadString(reqStr);
 
 			if(json.StartsWith("Signal:") && json.EndsWith("not found"))
 			{
 				OnMessage(string.Format("Error: {0}. Try again.", json));
+				return false;
+			}
+
+			if (json.StartsWith("Bad Request Status:"))
+			{
+				OnMessage(string.Format("Error: {0}", json));
 				return false;
 			}
 
@@ -279,7 +530,7 @@ namespace DVISApi
 				}
 			}
 
-			OnMessage(string.Format("{0}: {1:yyyy MM dd hh:mm:ss} (local) for {2:F0} hours. Type {3}. Count {4}", signal, dtReqStart.ToLocalTime(), (dtReqEnd - dtReqStart).TotalHours, type, count));
+			OnMessage(string.Format("{0}: {1:yyyy MM dd hh:mm:ss} (local) for {2:F0} hours. Type {3}. Count {4}", signal, dtStart.ToLocalTime(), (dtEnd - dtStart).TotalHours, type, count));
 
 			object o = null;
 			DateTime? dt = null;
@@ -301,13 +552,86 @@ namespace DVISApi
 
 				if (o != null && dt != null)
 				{
-					points.Add(TSWebFactory.Create(type, o, dt.Value));
+					addTo.Add(TSWebFactory.Create(type, o, dt.Value));
 					o  = null;
 					dt = null;
 				}
 			}
 
 			return true;
+		}
+
+		private TSPointWeb ReadPoint(string server, int port, string signal, DateTime dt)
+		{
+			try
+			{
+				WebClient webClient = new WebClient();
+
+				string reqStr = CreateRequestPoint(server, port, signal, dt);
+				string json = webClient.DownloadString(reqStr);
+
+				if (json.StartsWith("Signal:") && json.EndsWith("not found"))
+				{
+					OnMessage(string.Format("Error: {0}. Try again.", json));
+					return null;
+				}
+
+				if (json.StartsWith("Bad Request Status:"))
+				{
+					OnMessage(string.Format("Error: {0}", json));
+					return null;
+				}
+
+				JsonTextReader txtRdr = new JsonTextReader(new StringReader(json));
+
+				TSTypeWeb type = TSTypeWeb.Flag;
+				int count = 0;
+				object val;
+				while (txtRdr.Read())
+				{
+					val = txtRdr.Value;
+					if (StringEquals(val, "Type"))
+					{
+						txtRdr.Read();
+						var txtRdrValue = int.Parse(txtRdr.Value.ToString());
+						type = (TSTypeWeb)txtRdrValue;
+						break;
+					}
+					else
+					{
+						if(val != null)
+							OnMessage(val.ToString());
+					}
+				}
+
+				object o = null;
+				DateTime? rdt = null;
+
+				while(txtRdr.Read())
+				{
+					val = txtRdr.Value;
+
+					if (StringEquals(val, "Value"))
+					{
+						txtRdr.Read();
+						o = txtRdr.Value;
+					}
+				
+					if (StringEquals(val, "TimeStamp"))
+					{
+						rdt = txtRdr.ReadAsDateTime();
+					}
+				}
+
+				if(o != null && rdt != null)
+					return TSWebFactory.Create(type, o, rdt.Value);
+				return null;
+			}
+			catch (Exception e)
+			{
+				OnMessage("Error: " + e);
+				return null;
+			}
 		}
 
 		private void WriteCSV(string dir, string signal, DateTime dtStart, DateTime dtEnd, List<TSPointWeb> points)
@@ -346,11 +670,6 @@ namespace DVISApi
 			BeginInvoke((MethodInvoker) delegate { progressBar1.Value = progress; });
 		}
 
-		private static bool StringEquals(object val, string type)
-		{
-			return val != null && val.ToString() == type;
-		}
-
 		private void OnMessage(string msg)
 		{
 			if (InvokeRequired)
@@ -368,9 +687,10 @@ namespace DVISApi
 				listView1.Items.RemoveAt(100);
 		}
 
-		private bool TryGetHours(out double hours)
+
+		private bool TryGetPort(out int port)
 		{
-			return double.TryParse(textBoxDuration.Text, out hours);
+			return int.TryParse(textBoxPort.Text, out port);
 		}
 
 		private void SaveSettings()
@@ -380,13 +700,65 @@ namespace DVISApi
 			settings.InputFile       = textBoxInputFile.Text;
 			settings.OutputDirectory = textBoxOutputDir.Text;
 			settings.OutputDirectory = textBoxOutputDir.Text;
+			settings.Signal          = textBoxSignal.Text;
+			settings.CombineCSVs     = checkBoxCombineCSVs.Checked;
+			
 
-			double hours;
-			if (TryGetHours(out hours))
-				settings.Hours = hours;
+			int port;
+			if(TryGetPort(out port))
+				settings.Port = port;
 
 			settings.StartTime = dateTimePickerStart.Value;
+			settings.EndTime = dateTimePickerEnd.Value;
 			settings.Save();
 		}
+
+		private static string CreateRequestPoint(string host, int port, string signal, DateTime dt)
+		{
+			return string.Format("http://{0}:{1}/api/dvis/signalValue?signal={2}&dt={3:s}", host, port, signal.Replace(" ", "%20"), dt);
+		}
+
+		private static string CreateRequestArray(string host, int port, string signal, DateTime dtStart, DateTime dtEnd)
+		{
+			return string.Format("http://{0}:{1}/api/dvis/signalData?signal={2}&dateStart={3:s}&dateEnd={4:s}", host, port, signal.Replace(" ", "%20"), dtStart, dtEnd);
+		}
+
+		private static bool StringEquals(object val, string type)
+		{
+			return val != null && val.ToString() == type;
+		}
+    }
+
+    internal class TSPointWebIterator
+    {
+	    private readonly List<TSPointWeb> _points;
+	    private int _cur;
+
+	    public TSPointWebIterator(List<TSPointWeb> points)
+	    {
+		    Count = points.Count;
+
+		    _points = points;
+		    _cur = 0;
+	    }
+
+	    public int Count { get; private set; }
+
+	    public TSPointWeb Get(DateTime dt)
+	    {
+		    while (_cur < _points.Count && _points[_cur].TimeStamp < dt)
+		    {
+			    _cur++;
+		    }
+
+		    if (_cur < _points.Count)
+			    return _points[_cur];
+		    return _points.LastOrDefault();
+	    }
+
+	    public TSPointWeb this[int i]
+	    {
+		    get { return _points[i]; }
+	    }
     }
 }

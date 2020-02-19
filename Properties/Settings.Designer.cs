@@ -61,13 +61,13 @@ namespace DVISApi.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double Hours {
+        [global::System.Configuration.DefaultSettingValueAttribute("2020-02-02")]
+        public global::System.DateTime EndTime {
             get {
-                return ((double)(this["Hours"]));
+                return ((global::System.DateTime)(this["EndTime"]));
             }
             set {
-                this["Hours"] = value;
+                this["EndTime"] = value;
             }
         }
         
@@ -80,6 +80,42 @@ namespace DVISApi.Properties {
             }
             set {
                 this["StartTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("sim tag")]
+        public string Signal {
+            get {
+                return ((string)(this["Signal"]));
+            }
+            set {
+                this["Signal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5123")]
+        public int Port {
+            get {
+                return ((int)(this["Port"]));
+            }
+            set {
+                this["Port"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CombineCSVs {
+            get {
+                return ((bool)(this["CombineCSVs"]));
+            }
+            set {
+                this["CombineCSVs"] = value;
             }
         }
     }
