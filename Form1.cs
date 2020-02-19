@@ -282,19 +282,19 @@ namespace DVISApi
 			}
 		}
 
-		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> sigToPointsBlah, DateTime dtStartUTC, DateTime dtEndUTC, string dir)
+		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> signalsToPoints, DateTime dtStartUTC, DateTime dtEndUTC, string dir)
 		{
-			int[] options = {100, 250, 500, 750, 1000};
 
-			int best = options.Last();
-
-			Dictionary<string, TSPointWebIterator> sigToPoints = new Dictionary<string, TSPointWebIterator>();
-			foreach (var kvp in sigToPointsBlah)
+			Dictionary<string, TSPointWebIterator> signalsToIterators = new Dictionary<string, TSPointWebIterator>();
+			foreach (var kvp in signalsToPoints)
 			{
-				sigToPoints.Add(kvp.Key, new TSPointWebIterator(kvp.Value));
+				signalsToIterators.Add(kvp.Key, new TSPointWebIterator(kvp.Value));
 			}
 
-			foreach (var signal in sigToPoints)
+			// Determine highest frequency
+			int[] options = { 100, 250, 500, 750, 1000 };
+			int best = options.Last();
+			foreach (var signal in signalsToIterators)
 			{
 				var list = signal.Value;
 				double sum = 0d;
@@ -309,14 +309,19 @@ namespace DVISApi
 				int closest = options.Last();
 				for (int i = 0; i < options.Length; i++)
 				{
-					if (Math.Abs(avg - options[i]) < Math.Abs(avg - closest))
+					var diffToAvg = Math.Abs(avg - options[i]);
+					var difToClosest = Math.Abs(avg - closest);
+					if (diffToAvg < difToClosest)
 					{
 						closest = options[i];
 					}
 				}
 
-				if (closest < best)
+				if (avg > 0 && closest < best)
+				{
+					OnMessage(string.Format("Signal: {0} Avg Period ms: {1} Closest Period ms: {2}", signal.Key, avg, closest));
 					best = closest;
+				}
 			}
 
 			TimeSpan tsAdvance = TimeSpan.FromMilliseconds(best);
@@ -338,7 +343,7 @@ namespace DVISApi
 				File.Delete(outputFile);
 			}
 
-			List<string> signalNames = sigToPoints.Keys.ToList();
+			List<string> signalNames = signalsToIterators.Keys.ToList();
 
 			using (var fs = File.OpenWrite(outputFile))
 			{
@@ -363,7 +368,7 @@ namespace DVISApi
 							string signalName = signalNames[index];
 							var isLast = index == signalNames.Count - 1;
 							var post = isLast ? Environment.NewLine : ",";
-							var point = sigToPoints[signalName].Get(dtCur);
+							var point = signalsToIterators[signalName].Get(dtCur);
 							if (point == null)
 								sw.Write(post);
 							else
@@ -727,38 +732,5 @@ namespace DVISApi
 		{
 			return val != null && val.ToString() == type;
 		}
-    }
-
-    internal class TSPointWebIterator
-    {
-	    private readonly List<TSPointWeb> _points;
-	    private int _cur;
-
-	    public TSPointWebIterator(List<TSPointWeb> points)
-	    {
-		    Count = points.Count;
-
-		    _points = points;
-		    _cur = 0;
-	    }
-
-	    public int Count { get; private set; }
-
-	    public TSPointWeb Get(DateTime dt)
-	    {
-		    while (_cur < _points.Count && _points[_cur].TimeStamp < dt)
-		    {
-			    _cur++;
-		    }
-
-		    if (_cur < _points.Count)
-			    return _points[_cur];
-		    return _points.LastOrDefault();
-	    }
-
-	    public TSPointWeb this[int i]
-	    {
-		    get { return _points[i]; }
-	    }
     }
 }
