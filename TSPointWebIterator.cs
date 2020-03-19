@@ -25,32 +25,6 @@ namespace DVISApi
 			return GetFast(dt);
 		}
 
-		public TSPointWeb GetSlow(DateTime dt)
-		{
-			if (_points.Count == 0)
-				return null;
-
-			// You want the following conditions for the returned point p at index i:
-			// 1. p.Timestamp < dt (the signal has the value p.ValueObject at dt)
-			// 2. there is no index j > i for which 1. is true
-
-			for (int i = 0; i < _points.Count; i++)
-			{
-				if (_points[i].TimeStamp == dt)
-				{
-					return _points[i];
-				}
-				else if (_points[i].TimeStamp > dt)
-				{
-					if (i == 0)
-						return null;
-					return _points[i-1];
-				}
-			}
-
-			return _points.LastOrDefault();
-		}
-
 		public TSPointWeb GetFast(DateTime dt)
 		{
 			if (_points.Count == 0)
@@ -80,6 +54,33 @@ namespace DVISApi
 
 			return _points.LastOrDefault();
 		}
+
+		public TSPointWeb GetSlow(DateTime dt)
+		{
+			if (_points.Count == 0)
+				return null;
+
+			// You want the following conditions for the returned point p at index i:
+			// 1. p.Timestamp < dt (the signal has the value p.ValueObject at dt)
+			// 2. there is no index j > i for which 1. is true
+
+			for (int i = 0; i < _points.Count; i++)
+			{
+				if (_points[i].TimeStamp == dt)
+				{
+					return _points[i];
+				}
+				else if (_points[i].TimeStamp > dt)
+				{
+					if (i == 0)
+						return null;
+					return _points[i - 1];
+				}
+			}
+
+			return _points.LastOrDefault();
+		}
+
 
 
 		public TSPointWeb this[int i]

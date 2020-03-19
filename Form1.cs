@@ -87,7 +87,16 @@ namespace DVISApi
 			var outputDir = textBoxOutputDir.Text;
 
 			Ping ping = new Ping();
-			PingReply reply = ping.Send(server);
+			PingReply reply;
+			try
+			{
+				reply = ping.Send(server);
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show(string.Format("Ping Exception: {0}", exception));
+				return;
+			}
 			if (reply.Status != IPStatus.Success)
 			{
 				if (MessageBox.Show(string.Format("Ping {0} failed, continue?", server), "Hmmm", MessageBoxButtons.YesNo) == DialogResult.No)
@@ -237,7 +246,6 @@ namespace DVISApi
 
 					List<TSPointWeb> points = new List<TSPointWeb>();
 
-
 					var firstPoint = ReadPoint(server, port, signalName, dtStartLocal);
 					if (firstPoint != null)
 					{
@@ -284,7 +292,6 @@ namespace DVISApi
 
 		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> signalsToPoints, DateTime dtStartUTC, DateTime dtEndUTC, string dir)
 		{
-
 			Dictionary<string, TSPointWebIterator> signalsToIterators = new Dictionary<string, TSPointWebIterator>();
 			foreach (var kvp in signalsToPoints)
 			{
@@ -293,7 +300,7 @@ namespace DVISApi
 
 			// Determine highest frequency
 			int[] options = { 100, 250, 500, 750, 1000 };
-			int best = options.Last();
+			int highestFrequency = options.Last();
 			foreach (var signal in signalsToIterators)
 			{
 				var list = signal.Value;
@@ -317,16 +324,16 @@ namespace DVISApi
 					}
 				}
 
-				if (avg > 0 && closest < best)
+				if (avg > 0 && closest < highestFrequency)
 				{
 					OnMessage(string.Format("Signal: {0} Avg Period ms: {1} Closest Period ms: {2}", signal.Key, avg, closest));
-					best = closest;
+					highestFrequency = closest;
 				}
 			}
 
-			TimeSpan tsAdvance = TimeSpan.FromMilliseconds(best);
+			TimeSpan tsAdvance = TimeSpan.FromMilliseconds(highestFrequency);
 
-			OnMessage(string.Format("Using {0} ms", best));
+			OnMessage(string.Format("Using {0} ms", highestFrequency));
 
 			DateTime dtCur = dtStartUTC;
 			if (!dir.EndsWith("\\"))
@@ -349,8 +356,8 @@ namespace DVISApi
 			{
 				using (StreamWriter sw = new StreamWriter(fs))
 				{
+					// headers
 					sw.Write("Time,");
-
 					for (var index = 0; index < signalNames.Count; index++)
 					{
 						string signalName = signalNames[index];
@@ -359,6 +366,7 @@ namespace DVISApi
 						sw.Write(signalName + post);
 					}
 
+					// data
 					while (true)
 					{
 						sw.Write("{0:O},", dtCur);
