@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -198,9 +197,9 @@ namespace DVISApi
 				{
 					var o = point.ValueObject;
 					if(o is double)
-						OnMessage(string.Format("{0:hh:mm:ss.fff} {1:F2}", point.TimeStamp, (double)o));
+						OnMessage(string.Format("{0:HH:mm:ss.fff} {1:F2}", point.TimeStamp, (double)o));
 					else
-						OnMessage(string.Format("{0:hh:mm:ss.fff} {1:F2}", point.TimeStamp, o));
+						OnMessage(string.Format("{0:HH:mm:ss.fff} {1}", point.TimeStamp, o));
 				}
 				else
 				{
