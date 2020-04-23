@@ -602,6 +602,12 @@ namespace DVISApi
 					return null;
 				}
 
+				if (json.StartsWith("Error: point not found"))
+				{
+					OnMessage(string.Format("Point not found for {0} at {1} (local)", signal, dt.ToLocalTime()));
+					return null;
+				}
+
 				JsonTextReader txtRdr = new JsonTextReader(new StringReader(json));
 
 				TSTypeWeb type = TSTypeWeb.Flag;
