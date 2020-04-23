@@ -87,16 +87,7 @@ namespace DVISApi
 			var outputDir = textBoxOutputDir.Text;
 
 			Ping ping = new Ping();
-			PingReply reply;
-			try
-			{
-				reply = ping.Send(server);
-			}
-			catch (Exception exception)
-			{
-				MessageBox.Show(string.Format("Ping Exception: {0}", exception));
-				return;
-			}
+			PingReply reply = ping.Send(server);
 			if (reply.Status != IPStatus.Success)
 			{
 				if (MessageBox.Show(string.Format("Ping {0} failed, continue?", server), "Hmmm", MessageBoxButtons.YesNo) == DialogResult.No)
@@ -148,7 +139,7 @@ namespace DVISApi
 
 			SaveSettings();
 
-			buttonGo.Enabled     = false;
+			buttonGo.Enabled = false;
 			buttonCancel.Enabled = true;
 
 			bool oneFile = checkBoxCombineCSVs.Checked;
@@ -156,9 +147,15 @@ namespace DVISApi
 			ThreadPool.QueueUserWorkItem(delegate
 			{
 				if (oneFile)
-					ExportArrayOneFile(signalFile, dtEndLocal, dtStartLocal, server, port, outputDir);
+				{
+					DateTime dtStartUTC = dtStartLocal.ToUniversalTime();
+					DateTime dtEndUTC = dtEndLocal.ToUniversalTime();
+
+					string outputFile = string.Format(@"{0} {1:yyyy_MM_dd HHmm} {2:yyyy_MM_dd HHmm}.csv", outputDir, dtStartUTC, dtEndUTC);
+					ExportArrayOneFile(signalFile, dtStartLocal, dtEndLocal, server, port, outputFile);
+				}
 				else
-					ExportArrayMultipleFiles(signalFile, dtEndLocal, dtStartLocal, server, port, outputDir);
+					ExportArrayMultipleFiles(signalFile, dtStartLocal, dtEndLocal, server, port, outputDir);
 			});
 		}
 
@@ -212,8 +209,14 @@ namespace DVISApi
 			});
 		}
 
-		private void ExportArrayOneFile(string signalFile, DateTime dtEndLocal, DateTime dtStartLocal, string server, int port, string outputDir)
+		private ExportArrayResult ExportArrayOneFile(string signalFile, DateTime dtStartLocal, DateTime dtEndLocal, string server, int port, string outputFile)
 		{
+			BeginInvoke((MethodInvoker)delegate
+			{
+				buttonGo.Enabled = false;
+				buttonCancel.Enabled = true;
+			});
+
 			try
 			{
 				TimeSpan tsBatchSize = TimeSpan.FromHours(4);
@@ -256,11 +259,13 @@ namespace DVISApi
 					if (_cancel)
 					{
 						OnMessage("Cancelled");
-						return;
+						return new ExportArrayResult("Cancelled");
 					}
 
-					if(success)
+					if (success)
 						dic.Add(signalName, points);
+					else
+						return new ExportArrayResult("Export failed on signal " + signalName);
 
 					signalsComplete++;
 
@@ -269,14 +274,16 @@ namespace DVISApi
 
 				if (dic.Any())
 				{
-					ExportArrayOneFileCombine(dic, dtStartUtc, dtEndUtc, outputDir);
+					ExportArrayOneFileCombine(dic, dtStartUtc, dtEndUtc, outputFile);
 				}
 
 				UpdateProgress(100);
 			}
 			catch (Exception ex)
 			{
-				OnMessage(string.Format("Problem: {0}", ex));
+				var err = string.Format("Problem: {0}", ex);
+				OnMessage(err);
+				return new ExportArrayResult(err);
 			}
 			finally
 			{
@@ -284,13 +291,15 @@ namespace DVISApi
 				UpdateProgress(0);
 				BeginInvoke((MethodInvoker)delegate
 				{
-					buttonGo.Enabled     = true;
+					buttonGo.Enabled = true;
 					buttonCancel.Enabled = false;
 				});
 			}
+
+			return new ExportArrayResult();
 		}
 
-		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> signalsToPoints, DateTime dtStartUTC, DateTime dtEndUTC, string dir)
+		private void ExportArrayOneFileCombine(Dictionary<string, List<TSPointWeb>> signalsToPoints, DateTime dtStartUTC, DateTime dtEndUTC, string outputFile)
 		{
 			Dictionary<string, TSPointWebIterator> signalsToIterators = new Dictionary<string, TSPointWebIterator>();
 			foreach (var kvp in signalsToPoints)
@@ -312,7 +321,7 @@ namespace DVISApi
 					count++;
 				}
 
-				int avg = (int) Math.Round(sum / count);
+				int avg = (int)Math.Round(sum / count);
 				int closest = options.Last();
 				for (int i = 0; i < options.Length; i++)
 				{
@@ -336,12 +345,10 @@ namespace DVISApi
 			OnMessage(string.Format("Using {0} ms", highestFrequency));
 
 			DateTime dtCur = dtStartUTC;
-			if (!dir.EndsWith("\\"))
-				dir = dir + "\\";
 
-			string outputFile = string.Format(@"{0} {1:yyyy_MM_dd HHmm} {2:yyyy_MM_dd HHmm}.csv", dir, dtStartUTC, dtEndUTC);
+			string dir = Path.GetDirectoryName(outputFile);
 
-			if (!Directory.Exists(dir))
+			if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
 				Directory.CreateDirectory(dir);
 
 			if (File.Exists(outputFile))
@@ -356,8 +363,8 @@ namespace DVISApi
 			{
 				using (StreamWriter sw = new StreamWriter(fs))
 				{
-					// headers
 					sw.Write("Time,");
+
 					for (var index = 0; index < signalNames.Count; index++)
 					{
 						string signalName = signalNames[index];
@@ -366,7 +373,6 @@ namespace DVISApi
 						sw.Write(signalName + post);
 					}
 
-					// data
 					while (true)
 					{
 						sw.Write("{0:O},", dtCur);
@@ -392,9 +398,11 @@ namespace DVISApi
 					sw.Close();
 				}
 			}
+
+			OnMessage(string.Format("Wrote data to: {0}", outputFile));
 		}
 
-		private void ExportArrayMultipleFiles(string signalFile, DateTime dtEndLocal, DateTime dtStartLocal, string server, int port, string outputDir)
+		private void ExportArrayMultipleFiles(string signalFile, DateTime dtStartLocal, DateTime dtEndLocal, string server, int port, string outputDir)
 		{
 			try
 			{
@@ -691,15 +699,26 @@ namespace DVISApi
 				return;
 			}
 
-			ListViewItem item1 = new ListViewItem(string.Format("{0:hh:mm:ss.fff}", DateTime.Now.ToLocalTime()));
+			var time = string.Format("{0:hh:mm:ss.fff}", DateTime.Now.ToLocalTime());
+
+			if (checkBoxLogMessages.Checked)
+			{
+				var dir = @"C:\temp";
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
+				var fileName    = string.Format(@"{0}\{1:yyyy_MM_dd} dvisAPI.txt", dir,  DateTime.Now);
+				var fileMessage = string.Format("{0}{1}{2}{3}",                    time, '\t', msg, Environment.NewLine);
+				File.AppendAllText(fileName, fileMessage);
+			}
+
+			ListViewItem item1 = new ListViewItem(time);
 			item1.SubItems.Add(msg);
 
 			listView1.Items.Insert(0, item1);
 
-			if(listView1.Items.Count > 100)
+			if (listView1.Items.Count > 100)
 				listView1.Items.RemoveAt(100);
 		}
-
 
 		private bool TryGetPort(out int port)
 		{
@@ -740,5 +759,21 @@ namespace DVISApi
 		{
 			return val != null && val.ToString() == type;
 		}
+    }
+
+    public class ExportArrayResult
+    {
+	    public bool   Success { get; private set; }
+	    public string Err     { get; private set; }
+
+	    public ExportArrayResult()
+	    {
+		    Success = true;
+	    }
+
+	    public ExportArrayResult(string err)
+	    {
+		    Err = err;
+	    }
     }
 }

@@ -34,6 +34,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.dateTimePickerEnd = new System.Windows.Forms.DateTimePicker();
+            this.labelEnd = new System.Windows.Forms.Label();
             this.checkBoxCombineCSVs = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxPort = new System.Windows.Forms.TextBox();
@@ -57,9 +60,7 @@
             this.columnHeaderTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderMsg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label4 = new System.Windows.Forms.Label();
-            this.dateTimePickerEnd = new System.Windows.Forms.DateTimePicker();
-            this.labelEnd = new System.Windows.Forms.Label();
+            this.checkBoxLogMessages = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -122,6 +123,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.checkBoxLogMessages);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.dateTimePickerEnd);
             this.tabPage1.Controls.Add(this.labelEnd);
@@ -151,10 +153,40 @@
             this.tabPage1.Text = "Range";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(297, 97);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 13);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "local";
+            // 
+            // dateTimePickerEnd
+            // 
+            this.dateTimePickerEnd.CustomFormat = "MMMM dd, yyyy - h:mm:ss tt";
+            this.dateTimePickerEnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dateTimePickerEnd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePickerEnd.Location = new System.Drawing.Point(64, 92);
+            this.dateTimePickerEnd.Margin = new System.Windows.Forms.Padding(1);
+            this.dateTimePickerEnd.Name = "dateTimePickerEnd";
+            this.dateTimePickerEnd.Size = new System.Drawing.Size(229, 21);
+            this.dateTimePickerEnd.TabIndex = 21;
+            // 
+            // labelEnd
+            // 
+            this.labelEnd.AutoSize = true;
+            this.labelEnd.Location = new System.Drawing.Point(30, 97);
+            this.labelEnd.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.labelEnd.Name = "labelEnd";
+            this.labelEnd.Size = new System.Drawing.Size(26, 13);
+            this.labelEnd.TabIndex = 22;
+            this.labelEnd.Text = "End";
+            // 
             // checkBoxCombineCSVs
             // 
             this.checkBoxCombineCSVs.AutoSize = true;
-            this.checkBoxCombineCSVs.Location = new System.Drawing.Point(188, 121);
+            this.checkBoxCombineCSVs.Location = new System.Drawing.Point(188, 120);
             this.checkBoxCombineCSVs.Name = "checkBoxCombineCSVs";
             this.checkBoxCombineCSVs.Size = new System.Drawing.Size(131, 17);
             this.checkBoxCombineCSVs.TabIndex = 20;
@@ -375,35 +407,15 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1322, 788);
             this.tableLayoutPanel1.TabIndex = 5;
             // 
-            // label4
+            // checkBoxLogMessages
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(297, 97);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 13);
-            this.label4.TabIndex = 23;
-            this.label4.Text = "local";
-            // 
-            // dateTimePickerEnd
-            // 
-            this.dateTimePickerEnd.CustomFormat = "MMMM dd, yyyy - h:mm:ss tt";
-            this.dateTimePickerEnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dateTimePickerEnd.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePickerEnd.Location = new System.Drawing.Point(64, 92);
-            this.dateTimePickerEnd.Margin = new System.Windows.Forms.Padding(1);
-            this.dateTimePickerEnd.Name = "dateTimePickerEnd";
-            this.dateTimePickerEnd.Size = new System.Drawing.Size(229, 21);
-            this.dateTimePickerEnd.TabIndex = 21;
-            // 
-            // labelEnd
-            // 
-            this.labelEnd.AutoSize = true;
-            this.labelEnd.Location = new System.Drawing.Point(30, 97);
-            this.labelEnd.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.labelEnd.Name = "labelEnd";
-            this.labelEnd.Size = new System.Drawing.Size(26, 13);
-            this.labelEnd.TabIndex = 22;
-            this.labelEnd.Text = "End";
+            this.checkBoxLogMessages.AutoSize = true;
+            this.checkBoxLogMessages.Location = new System.Drawing.Point(330, 120);
+            this.checkBoxLogMessages.Name = "checkBoxLogMessages";
+            this.checkBoxLogMessages.Size = new System.Drawing.Size(126, 17);
+            this.checkBoxLogMessages.TabIndex = 24;
+            this.checkBoxLogMessages.Text = "Log Messages to File";
+            this.checkBoxLogMessages.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -459,6 +471,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DateTimePicker dateTimePickerEnd;
         private System.Windows.Forms.Label labelEnd;
+        private System.Windows.Forms.CheckBox checkBoxLogMessages;
     }
 }
 
