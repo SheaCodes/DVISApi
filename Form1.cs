@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,34 +23,10 @@ namespace DVISApi
 
 			OnMessage("Started");
 
-			var settings = Properties.Settings.Default;
-			string server = settings.Server;
-			string inputFile = settings.InputFile;
-			string outputDir = settings.OutputDirectory;
-			
-
-			DateTime dtStart = settings.StartTime;
-			DateTime dtEnd = settings.EndTime;
-
-			string signal = settings.Signal;
-
-			textBoxServer.Text = server;
-			textBoxPort.Text = settings.Port.ToString();
-			textBoxOutputDir.Text = outputDir;
-			textBoxInputFile.Text = inputFile;
-			
-			if(dtStart != DateTime.MinValue)
-				dateTimePickerStart.Value = dtStart;
-
-			if (dtEnd != DateTime.MinValue)
-				dateTimePickerEnd.Value = dtEnd;
-
-			textBoxSignal.Text = signal;
-
-			checkBoxCombineCSVs.Checked = settings.CombineCSVs;
+			LoadSettings();
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+	    protected override void OnClosing(CancelEventArgs e)
         {
 	        SaveSettings();
 
@@ -154,7 +131,7 @@ namespace DVISApi
 					ExportArrayOneFile(signalFile, dtStartLocal, dtEndLocal, server, port, outputFile);
 				}
 				else
-					ExportArrayMultipleFiles(signalFile, dtStartLocal, dtEndLocal, server, port, outputDir);
+					ExportArrayIndividualFiles(signalFile, dtStartLocal, dtEndLocal, server, port, outputDir);
 			});
 		}
 
@@ -200,6 +177,60 @@ namespace DVISApi
 						OnMessage(string.Format("{0:HH:mm:ss.fff} {1:F2}", point.TimeStamp, (double)o));
 					else
 						OnMessage(string.Format("{0:HH:mm:ss.fff} {1}", point.TimeStamp, o));
+				}
+				else
+				{
+					OnMessage("Point is null");
+				}
+			});
+		}
+
+		private void OnGetCurrentFrame(object sender, EventArgs e)
+		{
+			DoGetFrame(DateTime.UtcNow + TimeSpan.FromMinutes(1));
+		}
+
+		private void OnGetFrameAtClick(object sender, EventArgs e)
+		{
+			DoGetFrame(dateTimePickerVideo.Value);
+		}
+
+		private void DoGetFrame(DateTime dt)
+		{
+			var server = textBoxServer.Text;
+			var signal = textBoxVideo.Text;
+
+			if (string.IsNullOrEmpty(server))
+			{
+				OnMessage("Server is not set");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(signal))
+			{
+				OnMessage("Signal is not set");
+				return;
+			}
+
+			int port;
+			if (!TryGetPort(out port))
+			{
+				OnMessage(string.Format("Can not get port: {0}", textBoxPort.Text));
+				return;
+			}
+
+			SaveSettings();
+
+			ThreadPool.QueueUserWorkItem(delegate
+			{
+				TSVideoWeb point = ReadVideo(server, port, signal, dt);
+				if (point != null)
+				{
+					Bitmap bmp = point.Value;
+					if (bmp != null)
+					{
+						BeginInvoke((MethodInvoker) delegate { pictureBox1.Image = bmp; });
+					}
 				}
 				else
 				{
@@ -401,7 +432,7 @@ namespace DVISApi
 			OnMessage(string.Format("Wrote data to: {0}", outputFile));
 		}
 
-		private void ExportArrayMultipleFiles(string signalFile, DateTime dtStartLocal, DateTime dtEndLocal, string server, int port, string outputDir)
+		private void ExportArrayIndividualFiles(string signalFile, DateTime dtStartLocal, DateTime dtEndLocal, string server, int port, string outputDir)
 		{
 			try
 			{
@@ -517,7 +548,7 @@ namespace DVISApi
 			string reqStr = CreateRequestArray(server, port, signal, dtStart, dtEnd);
 			string json = webClient.DownloadString(reqStr);
 
-			if(json.StartsWith("Signal:") && json.EndsWith("not found"))
+			if(json.StartsWith("Signal:") && json.Contains("not found"))
 			{
 				OnMessage(string.Format("Error: {0}. Try again.", json));
 				return false;
@@ -535,14 +566,14 @@ namespace DVISApi
 			while (txtRdr.Read())
 			{
 				var val = txtRdr.Value;
-				if (StringEquals(val, "Type"))
+				if (ObjectAsStringEquals(val, "Type"))
 				{
 					txtRdr.Read();
 					var txtRdrValue = int.Parse(txtRdr.Value.ToString());
 					type = (TSTypeWeb) txtRdrValue;
 				}
 
-				if (StringEquals(val, "Count"))
+				if (ObjectAsStringEquals(val, "Count"))
 				{
 					txtRdr.Read();
 					count = int.Parse(txtRdr.Value.ToString());
@@ -559,13 +590,13 @@ namespace DVISApi
 			{
 				var val = txtRdr.Value;
 
-				if (StringEquals(val, "Value"))
+				if (ObjectAsStringEquals(val, "Value"))
 				{
 					txtRdr.Read();
 					o = txtRdr.Value;
 				}
 
-				if (StringEquals(val, "TimeStamp"))
+				if (ObjectAsStringEquals(val, "TimeStamp"))
 				{
 					dt = txtRdr.ReadAsDateTime();
 				}
@@ -590,7 +621,7 @@ namespace DVISApi
 				string reqStr = CreateRequestPoint(server, port, signal, dt);
 				string json = webClient.DownloadString(reqStr);
 
-				if (json.StartsWith("Signal:") && json.EndsWith("not found"))
+				if (json.StartsWith("Signal:") && json.Contains("not found"))
 				{
 					OnMessage(string.Format("Error: {0}. Try again.", json));
 					return null;
@@ -616,7 +647,7 @@ namespace DVISApi
 				while (txtRdr.Read())
 				{
 					val = txtRdr.Value;
-					if (StringEquals(val, "Type"))
+					if (ObjectAsStringEquals(val, "Type"))
 					{
 						txtRdr.Read();
 						var txtRdrValue = int.Parse(txtRdr.Value.ToString());
@@ -637,13 +668,13 @@ namespace DVISApi
 				{
 					val = txtRdr.Value;
 
-					if (StringEquals(val, "Value"))
+					if (ObjectAsStringEquals(val, "Value"))
 					{
 						txtRdr.Read();
 						o = txtRdr.Value;
 					}
 				
-					if (StringEquals(val, "TimeStamp"))
+					if (ObjectAsStringEquals(val, "TimeStamp"))
 					{
 						rdt = txtRdr.ReadAsDateTime();
 					}
@@ -651,6 +682,32 @@ namespace DVISApi
 
 				if(o != null && rdt != null)
 					return TSWebFactory.Create(type, o, rdt.Value);
+				return null;
+			}
+			catch (Exception e)
+			{
+				OnMessage("Error: " + e);
+				return null;
+			}
+		}
+
+		private TSVideoWeb ReadVideo(string server, int port, string video, DateTime dt)
+		{
+			try
+			{
+				WebClient webClient = new WebClient();
+
+				string reqStr = CreateRequestVideo(server, port, video, dt);
+
+				var data = webClient.DownloadData(reqStr);
+
+				OnMessage("Received data of size: " + data.Length);
+
+				if(data.Length > 0)
+				{
+					return new TSVideoWeb(new Bitmap(new MemoryStream(data)),dt);
+				}
+
 				return null;
 			}
 			catch (Exception e)
@@ -730,6 +787,41 @@ namespace DVISApi
 			return int.TryParse(textBoxPort.Text, out port);
 		}
 
+		private void LoadSettings()
+		{
+			var settings = Properties.Settings.Default;
+
+			string server    = settings.Server;
+			string inputFile = settings.InputFile;
+			string outputDir = settings.OutputDirectory;
+
+
+			DateTime dtStart = settings.StartTime;
+			DateTime dtEnd   = settings.EndTime;
+			DateTime dtVideo = settings.VideoTime;
+
+			string signal = settings.Signal;
+
+			textBoxServer.Text    = server;
+			textBoxPort.Text      = settings.Port.ToString();
+			textBoxOutputDir.Text = outputDir;
+			textBoxInputFile.Text = inputFile;
+
+			if (dtStart != DateTime.MinValue)
+				dateTimePickerStart.Value = dtStart;
+
+			if (dtEnd != DateTime.MinValue)
+				dateTimePickerEnd.Value = dtEnd;
+
+			if(dtVideo != DateTime.MinValue)
+				dateTimePickerVideo.Value = dtVideo;
+
+			textBoxSignal.Text = signal;
+			textBoxVideo.Text = settings.VideoSignal;
+
+			checkBoxCombineCSVs.Checked = settings.CombineCSVs;
+		}
+
 		private void SaveSettings()
 		{
 			var settings = Properties.Settings.Default;
@@ -739,6 +831,7 @@ namespace DVISApi
 			settings.OutputDirectory = textBoxOutputDir.Text;
 			settings.Signal          = textBoxSignal.Text;
 			settings.CombineCSVs     = checkBoxCombineCSVs.Checked;
+			settings.VideoSignal     = textBoxVideo.Text;
 			
 
 			int port;
@@ -747,6 +840,7 @@ namespace DVISApi
 
 			settings.StartTime = dateTimePickerStart.Value;
 			settings.EndTime = dateTimePickerEnd.Value;
+			settings.VideoTime = dateTimePickerVideo.Value;
 			settings.Save();
 		}
 
@@ -755,18 +849,23 @@ namespace DVISApi
 			return string.Format("http://{0}:{1}/api/dvis/signalValue?signal={2}&dt={3:s}", host, port, signal.Replace(" ", "%20"), dt);
 		}
 
+		private static string CreateRequestVideo(string host, int port, string signal, DateTime dt)
+		{
+			return string.Format("http://{0}:{1}/api/dvis/videoFrame?signal={2}&dt={3:s}", host, port, signal.Replace(" ", "%20"), dt);
+		}
+
 		private static string CreateRequestArray(string host, int port, string signal, DateTime dtStart, DateTime dtEnd)
 		{
 			return string.Format("http://{0}:{1}/api/dvis/signalData?signal={2}&dateStart={3:s}&dateEnd={4:s}", host, port, signal.Replace(" ", "%20"), dtStart, dtEnd);
 		}
 
-		private static bool StringEquals(object val, string type)
+		private static bool ObjectAsStringEquals(object val, string s)
 		{
-			return val != null && val.ToString() == type;
+			return val != null && string.Compare(val.ToString(), s, StringComparison.OrdinalIgnoreCase) == 0;
 		}
     }
 
-    public class ExportArrayResult
+	public class ExportArrayResult
     {
 	    public bool   Success { get; private set; }
 	    public string Err     { get; private set; }

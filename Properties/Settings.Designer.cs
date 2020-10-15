@@ -12,7 +12,7 @@ namespace DVISApi.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -61,7 +61,7 @@ namespace DVISApi.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2020-02-02")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2020-10-11")]
         public global::System.DateTime EndTime {
             get {
                 return ((global::System.DateTime)(this["EndTime"]));
@@ -73,7 +73,7 @@ namespace DVISApi.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2020-02-01")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2020-10-10")]
         public global::System.DateTime StartTime {
             get {
                 return ((global::System.DateTime)(this["StartTime"]));
@@ -116,6 +116,30 @@ namespace DVISApi.Properties {
             }
             set {
                 this["CombineCSVs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CSL - Wrapper South")]
+        public string VideoSignal {
+            get {
+                return ((string)(this["VideoSignal"]));
+            }
+            set {
+                this["VideoSignal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2020-10-10")]
+        public global::System.DateTime VideoTime {
+            get {
+                return ((global::System.DateTime)(this["VideoTime"]));
+            }
+            set {
+                this["VideoTime"] = value;
             }
         }
     }

@@ -12,10 +12,10 @@
       <Value Profile="(Default)">BHW-SP-CC1DVIS</Value>
     </Setting>
     <Setting Name="EndTime" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2020-02-02</Value>
+      <Value Profile="(Default)">2020-10-11</Value>
     </Setting>
     <Setting Name="StartTime" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2020-02-01</Value>
+      <Value Profile="(Default)">2020-10-10</Value>
     </Setting>
     <Setting Name="Signal" Type="System.String" Scope="User">
       <Value Profile="(Default)">sim tag</Value>
@@ -25,6 +25,12 @@
     </Setting>
     <Setting Name="CombineCSVs" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="VideoSignal" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CSL - Wrapper South</Value>
+    </Setting>
+    <Setting Name="VideoTime" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">2020-10-10</Value>
     </Setting>
   </Settings>
 </SettingsFile>
