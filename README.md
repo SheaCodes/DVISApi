@@ -21,5 +21,5 @@
  * If **Combine CSVs to One** is **not** checked, one CSV will be created for each signal
 
 
-##
+# Notes
 - Backwards compatible with C# 6.0 (Visual Studio 2013)
