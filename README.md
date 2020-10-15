@@ -19,3 +19,7 @@
  ![Combine CSVS to One PNG](https://github.com/SheaCodes/DVISApi/blob/master/readme%20combine%20csvs%20to%20one.png?raw=true)
  
  * If **Combine CSVs to One** is **not** checked, one CSV will be created for each signal
+
+
+##
+- Backwards compatible with C# 6.0 (Visual Studio 2013)
