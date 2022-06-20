@@ -621,7 +621,7 @@ namespace DVISApi
 				string reqStr = CreateRequestPoint(server, port, signal, dt);
 				string json = webClient.DownloadString(reqStr);
 
-				if (json.StartsWith("Signal:") && json.Contains("not found"))
+				if (json.StartsWith("Signal") && json.Contains("not found"))
 				{
 					OnMessage(string.Format("Error: {0}. Try again.", json));
 					return null;
