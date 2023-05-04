@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using DVISApi.TSTypes;
@@ -53,10 +55,52 @@ namespace DVISApi
 			textBoxInputFile.Text = dlg.FileName;
 		}
 
-		private void OnClickGo(object sender, EventArgs e)
+		private void buttonGoPostImage_Click(object sender, EventArgs e)
 		{
 			_cancel = false;
 
+			var server = textBoxServer.Text;
+			var imageFile = textboxPostImageFile.Text;
+			var signalName = textboxPostImageSignalName.Text;
+
+			Ping ping = new Ping();
+			PingReply reply = ping.Send(server);
+			if (reply.Status != IPStatus.Success)
+			{
+				if (MessageBox.Show(string.Format("Ping {0} failed, continue?", server), "Hmmm", MessageBoxButtons.YesNo) == DialogResult.No)
+					return;
+			}
+
+			OnMessage(string.Format("Ping succeeded in: {0} ms", reply.RoundtripTime));
+
+			if (!File.Exists(imageFile))
+			{
+				OnMessage("Image file does not exist: " + imageFile);
+				return;
+			}
+
+			int port;
+			if (!TryGetPort(out port))
+			{
+				OnMessage(string.Format("Can not get port: {0}", textBoxPort.Text));
+				return;
+			}
+
+			SaveSettings();
+
+			buttonGoPostImage.Enabled = false;
+			buttonCancelPostImage.Enabled = true;
+
+			ThreadPool.QueueUserWorkItem(delegate
+			{
+//				PostImagesOnLoop(server, port, signalName, imageFile);
+				PostImageFile(server, port, signalName, imageFile);
+			});
+		}
+
+		private void OnClickGo(object sender, EventArgs e)
+		{
+			_cancel = false;
 
 			var server = textBoxServer.Text;
 			var signalFile = textBoxInputFile.Text;
@@ -141,12 +185,30 @@ namespace DVISApi
 			_cancel = true;
 		}
 
+		private void buttonChooseImage_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Image files (*.bmp,png,jpg)|*.bmp;*.png;*.jpg;*.jpeg|All files (*.*)|*.*";
+
+			if (dlg.ShowDialog() != DialogResult.OK)
+				return;
+
+			textboxPostImageFile.Text = dlg.FileName;
+		}
+
+		private void buttonCancelPostImage_Click(object sender, EventArgs e)
+		{
+			OnMessage("Cancelled");
+			buttonGoPostImage.Enabled = true;
+			buttonCancelPostImage.Enabled = false;
+		}
+
 		private void OnClickReadCurrentValue(object sender, EventArgs e)
 		{
 			var server = textBoxServer.Text;
 			var signal = textBoxSignal.Text;
 
-			if(string.IsNullOrEmpty(server))
+			if (string.IsNullOrEmpty(server))
 			{
 				OnMessage("Server is not set");
 				return;
@@ -159,7 +221,7 @@ namespace DVISApi
 			}
 
 			int port;
-			if(!TryGetPort(out port))
+			if (!TryGetPort(out port))
 			{
 				OnMessage(string.Format("Can not get port: {0}", textBoxPort.Text));
 				return;
@@ -612,6 +674,106 @@ namespace DVISApi
 			return true;
 		}
 
+		#region Post TS image from file (all you need)
+
+		private void PostImagesOnLoop(string server, int port, string signalName, string imageFilePath)
+		{
+			int count = 0;
+			WebClient webClient = new WebClient();
+			string reqStr = CreatePostPoint(server, port, signalName);
+			var encBytes = GetBytesEncodedForHttpPost(imageFilePath);
+			while (true)
+			{
+				try
+				{
+					var resp = webClient.UploadData(reqStr, "POST", encBytes);
+					var text = Encoding.Default.GetString(resp);
+
+					if (text != "OK")
+					{
+						OnMessage(string.Format("Error: {0}. Try again.", text));
+					}
+					else
+						count++;
+				}
+				catch (Exception ex)
+				{
+					var err = string.Format("Problem: {0}", ex);
+					OnMessage(err);
+				}
+				Thread.Sleep(100);
+			}
+		}
+
+		private bool PostImageFile(string server, int port, string signalName, string imageFilePath)
+		{
+			try
+			{
+				WebClient webClient = new WebClient();
+
+				string reqStr = CreatePostPoint(server, port, signalName);
+				var encBytes = GetBytesEncodedForHttpPost(imageFilePath);
+
+				var resp = webClient.UploadData(reqStr, "POST", encBytes);
+				var text = Encoding.Default.GetString(resp);
+
+				if (text != "OK")
+				{
+					OnMessage(string.Format("Error: {0}. Try again.", text));
+					return false;
+				}
+
+				OnMessage(string.Format("Success"));
+				return true;
+			}
+			catch (Exception ex)
+			{
+				var err = string.Format("Problem: {0}", ex);
+				OnMessage(err);
+				return false;
+			}
+			finally
+			{
+				Thread.Sleep(1000);
+				BeginInvoke((MethodInvoker)delegate
+				{
+					buttonGoPostImage.Enabled = true;
+					buttonCancelPostImage.Enabled = false;
+				});
+			}
+		}
+
+		// for an in-memory bitmap
+		private byte[] GetBytesEncodedForHttpPost(Bitmap bmp, ImageFormat format)
+		{
+			using (var stream = new MemoryStream())
+			{
+				// Convert the bitmap to binary data then to a base 64 string
+				bmp.Save(stream, format);
+				byte[] rawBytes = stream.ToArray();
+				string sBitmap = Convert.ToBase64String(rawBytes);
+				var encBytes = Encoding.ASCII.GetBytes(sBitmap);
+				return encBytes;
+			}
+		}
+
+		// for an image on the file system
+		private byte[] GetBytesEncodedForHttpPost(string imageFilePath)
+		{
+			using (var stream = File.OpenRead(imageFilePath))
+			{
+				// Convert the binary data to a base 64 string
+				int len = (int)stream.Length;
+				byte[] rawBytes = new byte[len];
+				stream.Read(rawBytes, 0, len);
+				string sBitmap = Convert.ToBase64String(rawBytes);
+				var encBytes = Encoding.ASCII.GetBytes(sBitmap);
+				return encBytes;
+			}
+		}
+
+		#endregion
+
 		private TSPointWeb ReadPoint(string server, int port, string signal, DateTime dt)
 		{
 			try
@@ -636,6 +798,12 @@ namespace DVISApi
 				if (json.StartsWith("Error: point not found"))
 				{
 					OnMessage(string.Format("Point not found for {0} at {1} (local)", signal, dt.ToLocalTime()));
+					return null;
+				}
+
+				if (json.StartsWith("No data"))
+				{
+					OnMessage(string.Format(json));
 					return null;
 				}
 
@@ -664,7 +832,7 @@ namespace DVISApi
 				object o = null;
 				DateTime? rdt = null;
 
-				while(txtRdr.Read())
+				while (txtRdr.Read())
 				{
 					val = txtRdr.Value;
 
@@ -813,11 +981,14 @@ namespace DVISApi
 			if (dtEnd != DateTime.MinValue)
 				dateTimePickerEnd.Value = dtEnd;
 
-			if(dtVideo != DateTime.MinValue)
+			if (dtVideo != DateTime.MinValue)
 				dateTimePickerVideo.Value = dtVideo;
 
 			textBoxSignal.Text = signal;
 			textBoxVideo.Text = settings.VideoSignal;
+
+			textboxPostImageFile.Text = settings.PostImageFile;
+			textboxPostImageSignalName.Text = settings.PostImageSignalName;
 
 			checkBoxCombineCSVs.Checked = settings.CombineCSVs;
 		}
@@ -832,10 +1003,11 @@ namespace DVISApi
 			settings.Signal          = textBoxSignal.Text;
 			settings.CombineCSVs     = checkBoxCombineCSVs.Checked;
 			settings.VideoSignal     = textBoxVideo.Text;
-			
+			settings.PostImageFile   = textboxPostImageFile.Text;
+			settings.PostImageSignalName = textboxPostImageSignalName.Text;
 
 			int port;
-			if(TryGetPort(out port))
+			if (TryGetPort(out port))
 				settings.Port = port;
 
 			settings.StartTime = dateTimePickerStart.Value;
@@ -859,11 +1031,19 @@ namespace DVISApi
 			return string.Format("http://{0}:{1}/api/dvis/signalData?signal={2}&dateStart={3:s}&dateEnd={4:s}", host, port, signal.Replace(" ", "%20"), dtStart, dtEnd);
 		}
 
+		private static string CreatePostPoint(string host, int port, string signal, DateTime? dt = null)
+		{
+			if (dt == null)
+				dt = DateTime.UtcNow;
+			return string.Format("http://{0}:{1}/api/dvis/writeImage?signal={2}&dt={3:s}", host, port, signal.Replace(" ", "%20"), dt.Value);
+		}
+
+
 		private static bool ObjectAsStringEquals(object val, string s)
 		{
 			return val != null && string.Compare(val.ToString(), s, StringComparison.OrdinalIgnoreCase) == 0;
 		}
-    }
+	}
 
 	public class ExportArrayResult
     {
