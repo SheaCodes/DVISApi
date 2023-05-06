@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -679,9 +680,12 @@ namespace DVISApi
 		private void PostImagesOnLoop(string server, int port, string signalName, string imageFilePath)
 		{
 			int count = 0;
+			int imageWidth, imageHeight;
 			WebClient webClient = new WebClient();
-			string reqStr = CreatePostPoint(server, port, signalName);
-			var encBytes = GetBytesEncodedForHttpPost(imageFilePath);
+
+			var encBytes = GetBytesEncodedForHttpPost(imageFilePath, out imageWidth, out imageHeight);
+			string reqStr = CreatePostImage(server, port, signalName, imageWidth, imageHeight);
+
 			while (true)
 			{
 				try
@@ -709,10 +713,11 @@ namespace DVISApi
 		{
 			try
 			{
+				int imageWidth, imageHeight;
 				WebClient webClient = new WebClient();
 
-				string reqStr = CreatePostPoint(server, port, signalName);
-				var encBytes = GetBytesEncodedForHttpPost(imageFilePath);
+				var encBytes = GetBytesEncodedForHttpPost(imageFilePath, out imageWidth, out imageHeight);
+				string reqStr = CreatePostImage(server, port, signalName, imageWidth, imageHeight);
 
 				var resp = webClient.UploadData(reqStr, "POST", encBytes);
 				var text = Encoding.Default.GetString(resp);
@@ -758,8 +763,25 @@ namespace DVISApi
 		}
 
 		// for an image on the file system
-		private byte[] GetBytesEncodedForHttpPost(string imageFilePath)
+		private byte[] GetBytesEncodedForHttpPost(string imageFilePath, out int imageWidth, out int imageHeight)
 		{
+			// apparently this method is way faster
+			using (var stream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				int len = (int)stream.Length;
+				using (var image = Image.FromStream(stream, false, false))
+				{
+					imageWidth = image.Width;
+					imageHeight = image.Height;
+				}
+				stream.Seek(0, SeekOrigin.Begin);
+				byte[] rawBytes = new byte[len];
+				stream.Read(rawBytes, 0, len);
+				string sBitmap = Convert.ToBase64String(rawBytes);
+				var encBytes = Encoding.ASCII.GetBytes(sBitmap);
+				return encBytes;
+			}
+/*
 			using (var stream = File.OpenRead(imageFilePath))
 			{
 				// Convert the binary data to a base 64 string
@@ -770,6 +792,7 @@ namespace DVISApi
 				var encBytes = Encoding.ASCII.GetBytes(sBitmap);
 				return encBytes;
 			}
+*/
 		}
 
 		#endregion
@@ -1031,11 +1054,11 @@ namespace DVISApi
 			return string.Format("http://{0}:{1}/api/dvis/signalData?signal={2}&dateStart={3:s}&dateEnd={4:s}", host, port, signal.Replace(" ", "%20"), dtStart, dtEnd);
 		}
 
-		private static string CreatePostPoint(string host, int port, string signal, DateTime? dt = null)
+		private static string CreatePostImage(string host, int port, string signal, int width, int height, DateTime? dt = null)
 		{
 			if (dt == null)
 				dt = DateTime.UtcNow;
-			return string.Format("http://{0}:{1}/api/dvis/writeImage?signal={2}&dt={3:s}", host, port, signal.Replace(" ", "%20"), dt.Value);
+			return string.Format("http://{0}:{1}/api/dvis/writeImage?signal={2}&width={3}&height={4}&dt={5:s}", host, port, signal.Replace(" ", "%20"), width, height, dt.Value);
 		}
 
 
