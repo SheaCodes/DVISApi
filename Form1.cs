@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -27,6 +26,10 @@ namespace DVISApi
 			OnMessage("Started");
 
 			LoadSettings();
+
+			var statsControl = new LaserStatsControl();
+			statsControl.Dock = DockStyle.Fill;
+			tabPage5.Controls.Add(statsControl);
         }
 
 	    protected override void OnClosing(CancelEventArgs e)

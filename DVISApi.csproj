@@ -63,6 +63,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="LaserStatsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LaserStatsControl.Designer.cs">
+      <DependentUpon>LaserStatsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TSPointWebIterator.cs" />
@@ -76,6 +82,9 @@
     <Compile Include="TSTypes\TSWebFactory.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LaserStatsControl.resx">
+      <DependentUpon>LaserStatsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
