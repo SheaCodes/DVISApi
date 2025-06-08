@@ -47,6 +47,24 @@
     <Setting Name="LaserCampaignDb" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="LaserStatsServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaserStatsVessel" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaserStatsDateStart" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaserStatsDateEnd" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaserStatsDb" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LaserStatsStat" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
     <Setting Name="PostImageFile" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
