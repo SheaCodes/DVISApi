@@ -202,6 +202,78 @@ namespace DVISApi.Properties {
                 this["LaserCampaignDb"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsServer {
+            get {
+                return ((string)(this["LaserStatsServer"]));
+            }
+            set {
+                this["LaserStatsServer"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsVessel {
+            get {
+                return ((string)(this["LaserStatsVessel"]));
+            }
+            set {
+                this["LaserStatsVessel"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsDateStart {
+            get {
+                return ((string)(this["LaserStatsDateStart"]));
+            }
+            set {
+                this["LaserStatsDateStart"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsDateEnd {
+            get {
+                return ((string)(this["LaserStatsDateEnd"]));
+            }
+            set {
+                this["LaserStatsDateEnd"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsDb {
+            get {
+                return ((string)(this["LaserStatsDb"]));
+            }
+            set {
+                this["LaserStatsDb"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserStatsStat {
+            get {
+                return ((string)(this["LaserStatsStat"]));
+            }
+            set {
+                this["LaserStatsStat"] = value;
+            }
+        }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
