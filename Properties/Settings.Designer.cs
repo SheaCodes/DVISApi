@@ -12,7 +12,7 @@ namespace DVISApi.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -142,35 +142,89 @@ namespace DVISApi.Properties {
                 this["VideoTime"] = value;
             }
         }
-
-		[global::System.Configuration.UserScopedSettingAttribute()]
-		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-		[global::System.Configuration.DefaultSettingValueAttribute("")]
-		public string PostImageFile
-		{
-			get
-			{
-				return ((string)(this["PostImageFile"]));
-			}
-			set
-			{
-				this["PostImageFile"] = value;
-			}
-		}
-
-		[global::System.Configuration.UserScopedSettingAttribute()]
-		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-		[global::System.Configuration.DefaultSettingValueAttribute("")]
-		public string PostImageSignalName
-		{
-			get
-			{
-				return ((string)(this["PostImageSignalName"]));
-			}
-			set
-			{
-				this["PostImageSignalName"] = value;
-			}
-		}
-	}
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserCampaignServer {
+            get {
+                return ((string)(this["LaserCampaignServer"]));
+            }
+            set {
+                this["LaserCampaignServer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserCampaignVessel {
+            get {
+                return ((string)(this["LaserCampaignVessel"]));
+            }
+            set {
+                this["LaserCampaignVessel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserCampaignDateStart {
+            get {
+                return ((string)(this["LaserCampaignDateStart"]));
+            }
+            set {
+                this["LaserCampaignDateStart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserCampaignDateEnd {
+            get {
+                return ((string)(this["LaserCampaignDateEnd"]));
+            }
+            set {
+                this["LaserCampaignDateEnd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserCampaignDb {
+            get {
+                return ((string)(this["LaserCampaignDb"]));
+            }
+            set {
+                this["LaserCampaignDb"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PostImageFile {
+            get {
+                return ((string)(this["PostImageFile"]));
+            }
+            set {
+                this["PostImageFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PostImageSignalName {
+            get {
+                return ((string)(this["PostImageSignalName"]));
+            }
+            set {
+                this["PostImageSignalName"] = value;
+            }
+        }
+    }
 }

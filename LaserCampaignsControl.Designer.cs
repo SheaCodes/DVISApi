@@ -1,6 +1,6 @@
 ﻿namespace DVISApi
 {
-	partial class LaserStatsControl
+	partial class LaserCampaignsControl
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -34,7 +34,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 29F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Name = "LaserStatsControl";
+			this.Name = "LaserCampaignsControl";
 			this.Size = new System.Drawing.Size(1518, 966);
 			this.ResumeLayout(false);
 

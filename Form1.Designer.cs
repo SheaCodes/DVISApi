@@ -74,11 +74,11 @@
 			this.buttonChooseImage = new System.Windows.Forms.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.buttonGoPostImage = new System.Windows.Forms.Button();
+			this.tabPage5 = new System.Windows.Forms.TabPage();
 			this.listView1 = new System.Windows.Forms.ListView();
 			this.columnHeaderTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeaderMsg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.tabPage5 = new System.Windows.Forms.TabPage();
 			this.groupBox1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
@@ -142,7 +142,7 @@
 			this.tabControl1.Controls.Add(this.tabPage5);
 			this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tabControl1.Location = new System.Drawing.Point(2, 30);
-			this.tabControl1.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.tabControl1.Margin = new System.Windows.Forms.Padding(7);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
 			this.tabControl1.Size = new System.Drawing.Size(3077, 1422);
@@ -172,11 +172,11 @@
 			this.tabPage1.Controls.Add(this.label2);
 			this.tabPage1.Controls.Add(this.buttonGo);
 			this.tabPage1.Controls.Add(this.progressBar1);
-			this.tabPage1.Location = new System.Drawing.Point(10, 47);
-			this.tabPage1.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.tabPage1.Location = new System.Drawing.Point(8, 43);
+			this.tabPage1.Margin = new System.Windows.Forms.Padding(7);
 			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(7, 7, 7, 7);
-			this.tabPage1.Size = new System.Drawing.Size(3057, 1365);
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(7);
+			this.tabPage1.Size = new System.Drawing.Size(3061, 1371);
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "Range";
 			this.tabPage1.UseVisualStyleBackColor = true;
@@ -185,7 +185,7 @@
 			// 
 			this.checkBoxLogMessages.AutoSize = true;
 			this.checkBoxLogMessages.Location = new System.Drawing.Point(770, 268);
-			this.checkBoxLogMessages.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.checkBoxLogMessages.Margin = new System.Windows.Forms.Padding(7);
 			this.checkBoxLogMessages.Name = "checkBoxLogMessages";
 			this.checkBoxLogMessages.Size = new System.Drawing.Size(276, 33);
 			this.checkBoxLogMessages.TabIndex = 24;
@@ -210,7 +210,7 @@
 			this.dateTimePickerEnd.Location = new System.Drawing.Point(149, 205);
 			this.dateTimePickerEnd.Margin = new System.Windows.Forms.Padding(2);
 			this.dateTimePickerEnd.Name = "dateTimePickerEnd";
-			this.dateTimePickerEnd.Size = new System.Drawing.Size(529, 38);
+			this.dateTimePickerEnd.Size = new System.Drawing.Size(529, 35);
 			this.dateTimePickerEnd.TabIndex = 21;
 			// 
 			// labelEnd
@@ -227,7 +227,7 @@
 			// 
 			this.checkBoxCombineCSVs.AutoSize = true;
 			this.checkBoxCombineCSVs.Location = new System.Drawing.Point(439, 268);
-			this.checkBoxCombineCSVs.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.checkBoxCombineCSVs.Margin = new System.Windows.Forms.Padding(7);
 			this.checkBoxCombineCSVs.Name = "checkBoxCombineCSVs";
 			this.checkBoxCombineCSVs.Size = new System.Drawing.Size(287, 33);
 			this.checkBoxCombineCSVs.TabIndex = 20;
@@ -247,7 +247,7 @@
 			// textBoxPort
 			// 
 			this.textBoxPort.Location = new System.Drawing.Point(758, 2);
-			this.textBoxPort.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.textBoxPort.Margin = new System.Windows.Forms.Padding(7);
 			this.textBoxPort.Name = "textBoxPort";
 			this.textBoxPort.Size = new System.Drawing.Size(228, 35);
 			this.textBoxPort.TabIndex = 18;
@@ -310,7 +310,7 @@
 			this.dateTimePickerStart.Location = new System.Drawing.Point(149, 156);
 			this.dateTimePickerStart.Margin = new System.Windows.Forms.Padding(2);
 			this.dateTimePickerStart.Name = "dateTimePickerStart";
-			this.dateTimePickerStart.Size = new System.Drawing.Size(529, 38);
+			this.dateTimePickerStart.Size = new System.Drawing.Size(529, 35);
 			this.dateTimePickerStart.TabIndex = 3;
 			// 
 			// labelOutputDirectory
@@ -376,11 +376,11 @@
 			this.tabPage2.Controls.Add(this.labelSignal);
 			this.tabPage2.Controls.Add(this.textBoxSignal);
 			this.tabPage2.Controls.Add(this.buttonReadCurrentValue);
-			this.tabPage2.Location = new System.Drawing.Point(10, 47);
-			this.tabPage2.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.tabPage2.Location = new System.Drawing.Point(8, 43);
+			this.tabPage2.Margin = new System.Windows.Forms.Padding(7);
 			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(7, 7, 7, 7);
-			this.tabPage2.Size = new System.Drawing.Size(3057, 1365);
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(7);
+			this.tabPage2.Size = new System.Drawing.Size(3061, 1371);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Single Point";
 			this.tabPage2.UseVisualStyleBackColor = true;
@@ -398,7 +398,7 @@
 			// textBoxSignal
 			// 
 			this.textBoxSignal.Location = new System.Drawing.Point(112, 20);
-			this.textBoxSignal.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.textBoxSignal.Margin = new System.Windows.Forms.Padding(7);
 			this.textBoxSignal.Name = "textBoxSignal";
 			this.textBoxSignal.Size = new System.Drawing.Size(622, 35);
 			this.textBoxSignal.TabIndex = 1;
@@ -406,7 +406,7 @@
 			// buttonReadCurrentValue
 			// 
 			this.buttonReadCurrentValue.Location = new System.Drawing.Point(766, 14);
-			this.buttonReadCurrentValue.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.buttonReadCurrentValue.Margin = new System.Windows.Forms.Padding(7);
 			this.buttonReadCurrentValue.Name = "buttonReadCurrentValue";
 			this.buttonReadCurrentValue.Size = new System.Drawing.Size(338, 51);
 			this.buttonReadCurrentValue.TabIndex = 0;
@@ -417,10 +417,10 @@
 			// tabPage3
 			// 
 			this.tabPage3.Controls.Add(this.tableLayoutPanel2);
-			this.tabPage3.Location = new System.Drawing.Point(10, 47);
+			this.tabPage3.Location = new System.Drawing.Point(8, 43);
 			this.tabPage3.Name = "tabPage3";
 			this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage3.Size = new System.Drawing.Size(3057, 1365);
+			this.tabPage3.Size = new System.Drawing.Size(3061, 1371);
 			this.tabPage3.TabIndex = 2;
 			this.tabPage3.Text = "Video Frame";
 			this.tabPage3.UseVisualStyleBackColor = true;
@@ -437,7 +437,7 @@
 			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
 			this.tableLayoutPanel2.RowCount = 1;
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(3051, 1359);
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(3055, 1365);
 			this.tableLayoutPanel2.TabIndex = 10;
 			// 
 			// panel1
@@ -450,7 +450,7 @@
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel1.Location = new System.Drawing.Point(3, 3);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(806, 1353);
+			this.panel1.Size = new System.Drawing.Size(806, 1359);
 			this.panel1.TabIndex = 11;
 			// 
 			// label3
@@ -466,7 +466,7 @@
 			// buttonGetFrameAt
 			// 
 			this.buttonGetFrameAt.Location = new System.Drawing.Point(134, 140);
-			this.buttonGetFrameAt.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.buttonGetFrameAt.Margin = new System.Windows.Forms.Padding(7);
 			this.buttonGetFrameAt.Name = "buttonGetFrameAt";
 			this.buttonGetFrameAt.Size = new System.Drawing.Size(338, 51);
 			this.buttonGetFrameAt.TabIndex = 9;
@@ -477,7 +477,7 @@
 			// buttonGetCurrentFrame
 			// 
 			this.buttonGetCurrentFrame.Location = new System.Drawing.Point(134, 75);
-			this.buttonGetCurrentFrame.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.buttonGetCurrentFrame.Margin = new System.Windows.Forms.Padding(7);
 			this.buttonGetCurrentFrame.Name = "buttonGetCurrentFrame";
 			this.buttonGetCurrentFrame.Size = new System.Drawing.Size(338, 51);
 			this.buttonGetCurrentFrame.TabIndex = 3;
@@ -493,13 +493,13 @@
 			this.dateTimePickerVideo.Location = new System.Drawing.Point(134, 204);
 			this.dateTimePickerVideo.Margin = new System.Windows.Forms.Padding(2);
 			this.dateTimePickerVideo.Name = "dateTimePickerVideo";
-			this.dateTimePickerVideo.Size = new System.Drawing.Size(529, 38);
+			this.dateTimePickerVideo.Size = new System.Drawing.Size(529, 35);
 			this.dateTimePickerVideo.TabIndex = 7;
 			// 
 			// textBoxVideo
 			// 
 			this.textBoxVideo.Location = new System.Drawing.Point(134, 26);
-			this.textBoxVideo.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.textBoxVideo.Margin = new System.Windows.Forms.Padding(7);
 			this.textBoxVideo.Name = "textBoxVideo";
 			this.textBoxVideo.Size = new System.Drawing.Size(622, 35);
 			this.textBoxVideo.TabIndex = 4;
@@ -509,7 +509,7 @@
 			this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.pictureBox1.Location = new System.Drawing.Point(815, 3);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(2233, 1353);
+			this.pictureBox1.Size = new System.Drawing.Size(2237, 1359);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.pictureBox1.TabIndex = 6;
 			this.pictureBox1.TabStop = false;
@@ -523,10 +523,10 @@
 			this.tabPage4.Controls.Add(this.buttonChooseImage);
 			this.tabPage4.Controls.Add(this.label5);
 			this.tabPage4.Controls.Add(this.buttonGoPostImage);
-			this.tabPage4.Location = new System.Drawing.Point(10, 47);
+			this.tabPage4.Location = new System.Drawing.Point(8, 43);
 			this.tabPage4.Name = "tabPage4";
 			this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage4.Size = new System.Drawing.Size(3057, 1365);
+			this.tabPage4.Size = new System.Drawing.Size(3061, 1371);
 			this.tabPage4.TabIndex = 3;
 			this.tabPage4.Text = "Post Image";
 			this.tabPage4.UseVisualStyleBackColor = true;
@@ -555,7 +555,7 @@
 			// textboxPostImageSignalName
 			// 
 			this.textboxPostImageSignalName.Location = new System.Drawing.Point(199, 85);
-			this.textboxPostImageSignalName.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.textboxPostImageSignalName.Margin = new System.Windows.Forms.Padding(7);
 			this.textboxPostImageSignalName.Name = "textboxPostImageSignalName";
 			this.textboxPostImageSignalName.Size = new System.Drawing.Size(622, 35);
 			this.textboxPostImageSignalName.TabIndex = 13;
@@ -600,6 +600,15 @@
 			this.buttonGoPostImage.UseVisualStyleBackColor = true;
 			this.buttonGoPostImage.Click += new System.EventHandler(this.buttonGoPostImage_Click);
 			// 
+			// tabPage5
+			// 
+			this.tabPage5.Location = new System.Drawing.Point(8, 43);
+			this.tabPage5.Name = "tabPage5";
+			this.tabPage5.Size = new System.Drawing.Size(3061, 1371);
+			this.tabPage5.TabIndex = 4;
+			this.tabPage5.Text = "Laser Campaigns";
+			this.tabPage5.UseVisualStyleBackColor = true;
+			// 
 			// listView1
 			// 
 			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -608,7 +617,7 @@
 			this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.listView1.HideSelection = false;
 			this.listView1.Location = new System.Drawing.Point(7, 1465);
-			this.listView1.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.listView1.Margin = new System.Windows.Forms.Padding(7);
 			this.listView1.MultiSelect = false;
 			this.listView1.Name = "listView1";
 			this.listView1.Size = new System.Drawing.Size(3071, 286);
@@ -634,22 +643,13 @@
 			this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 0);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(7);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 300F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(3085, 1758);
 			this.tableLayoutPanel1.TabIndex = 5;
-			// 
-			// tabPage5
-			// 
-			this.tabPage5.Location = new System.Drawing.Point(10, 47);
-			this.tabPage5.Name = "tabPage5";
-			this.tabPage5.Size = new System.Drawing.Size(3057, 1365);
-			this.tabPage5.TabIndex = 4;
-			this.tabPage5.Text = "Laser Stats";
-			this.tabPage5.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 

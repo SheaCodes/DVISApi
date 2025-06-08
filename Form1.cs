@@ -18,6 +18,8 @@ namespace DVISApi
     public partial class Form1 : Form
     {
 	    private bool _cancel;
+        private ContextMenuStrip listViewContextMenu;
+        private ToolStripMenuItem copyMenuItem;
 
 	    public Form1()
         {
@@ -27,9 +29,15 @@ namespace DVISApi
 
 			LoadSettings();
 
-			var statsControl = new LaserStatsControl();
+			var statsControl = new LaserCampaignsControl(OnMessage);
 			statsControl.Dock = DockStyle.Fill;
 			tabPage5.Controls.Add(statsControl);
+
+            listViewContextMenu = new ContextMenuStrip();
+            copyMenuItem = new ToolStripMenuItem("Copy", null, OnCopyListViewItems);
+            listViewContextMenu.Items.Add(copyMenuItem);
+            listView1.ContextMenuStrip = listViewContextMenu;
+            listView1.MultiSelect = true; // Allow multiple selection if not already set
         }
 
 	    protected override void OnClosing(CancelEventArgs e)
@@ -839,7 +847,6 @@ namespace DVISApi
 				JsonTextReader txtRdr = new JsonTextReader(new StringReader(json));
 
 				TSTypeWeb type = TSTypeWeb.Flag;
-				int count = 0;
 				object val;
 				while (txtRdr.Read())
 				{
@@ -1072,6 +1079,21 @@ namespace DVISApi
 		{
 			return val != null && string.Compare(val.ToString(), s, StringComparison.OrdinalIgnoreCase) == 0;
 		}
+
+        private void OnCopyListViewItems(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count == 0)
+                return;
+
+            var sb = new StringBuilder();
+            foreach (ListViewItem item in listView1.SelectedItems)
+            {
+                // Concatenate all subitems (time and message)
+                var line = string.Join("\t", item.SubItems.Cast<ListViewItem.ListViewSubItem>().Select(sub => sub.Text));
+                sb.AppendLine(line);
+            }
+            Clipboard.SetText(sb.ToString());
+        }
 	}
 
 	public class ExportArrayResult
