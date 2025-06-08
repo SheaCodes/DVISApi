@@ -406,18 +406,21 @@ namespace DVISApi
 			// Determine highest frequency
 			int[] options = { 100, 250, 500, 750, 1000 };
 			int highestFrequency = options.Last();
-			foreach (var signal in signalsToIterators)
-			{
-				var list = signal.Value;
-				double sum = 0d;
-				int count = 0;
-				for (int i = 2; i < 10 && i < list.Count; i++)
-				{
-					sum += Math.Round((list[i].TimeStamp - list[i - 1].TimeStamp).TotalMilliseconds);
-					count++;
-				}
+                        foreach (var signal in signalsToIterators)
+                        {
+                                var list = signal.Value;
+                                double sum = 0d;
+                                int count = 0;
+                                for (int i = 2; i < 10 && i < list.Count; i++)
+                                {
+                                        sum += Math.Round((list[i].TimeStamp - list[i - 1].TimeStamp).TotalMilliseconds);
+                                        count++;
+                                }
 
-				int avg = (int)Math.Round(sum / count);
+                                if (count == 0)
+                                        continue;
+
+                                int avg = (int)Math.Round(sum / count);
 				int closest = options.Last();
 				for (int i = 0; i < options.Length; i++)
 				{
