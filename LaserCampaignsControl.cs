@@ -30,6 +30,9 @@ namespace DVISApi
         private string _lastCsvResult = null;
         private Button buttonSaveCsv;
 
+        CheckBox checkBoxIncludeVessel;
+        TextBox textBoxFilterString;
+
         public LaserCampaignsControl(Action<string> onMsg)
         {
 	        _onMsg = onMsg;
@@ -39,80 +42,109 @@ namespace DVISApi
             listViewCampaigns.ColumnClick += ListViewCampaigns_ColumnClick;
         }
 
-        void InitializeCustomControls()
-        {
-            labelServer = new Label { Text = "Server", Location = new Point(10, 10), AutoSize = true };
-            labelVessel = new Label { Text = "Vessel", Location = new Point(10, 40), AutoSize = true };
-            labelDateStart = new Label { Text = "Date Start", Location = new Point(10, 70), AutoSize = true };
-            labelDateEnd = new Label { Text = "Date End", Location = new Point(10, 100), AutoSize = true };
-            labelDb = new Label { Text = "DB", Location = new Point(10, 130), AutoSize = true };
+		void InitializeCustomControls()
+		{
+			labelServer = new Label { Text = "Server", Location = new Point(10, 10), AutoSize = true };
+			labelVessel = new Label { Text = "Vessel", Location = new Point(10, 40), AutoSize = true };
+			labelDateStart = new Label { Text = "Date Start", Location = new Point(10, 70), AutoSize = true };
+			labelDateEnd = new Label { Text = "Date End", Location = new Point(10, 100), AutoSize = true };
+			labelDb = new Label { Text = "DB", Location = new Point(10, 130), AutoSize = true };
 
-            textBoxServer = new TextBox { Location = new Point(80, 10), Width = 200, Text = "10.28.13.71:5123" };
-            textBoxVessel = new TextBox { Location = new Point(80, 40), Width = 200 };
-            textBoxDateStart = new TextBox { Location = new Point(80, 70), Width = 200 };
-            textBoxDateEnd = new TextBox { Location = new Point(80, 100), Width = 200 };
-            textBoxDb = new TextBox { Location = new Point(80, 130), Width = 200 };
+			textBoxServer = new TextBox { Location = new Point(80, 10), Width = 200, Text = "10.28.13.71:5123" };
+			textBoxVessel = new TextBox { Location = new Point(80, 40), Width = 200 };
+			textBoxDateStart = new TextBox { Location = new Point(80, 70), Width = 200 };
+			textBoxDateEnd = new TextBox { Location = new Point(80, 100), Width = 200 };
+			textBoxDb = new TextBox { Location = new Point(80, 130), Width = 200 };
 
-            buttonQuery = new Button { Text = "Query", Location = new Point(80, 160), Width = 100 };
-            buttonQuery.Click += ButtonQuery_Click;
+			checkBoxIncludeVessel = new CheckBox
+			{
+				Text = "Include",
+				Location = new Point(textBoxVessel.Right + 5, textBoxVessel.Top + 2),
+				AutoSize = true,
+				Checked = true
+			};
+			Controls.Add(checkBoxIncludeVessel);
 
-            buttonCancel = new Button { Text = "Cancel", Location = new Point(190, 160), Width = 100, Enabled = false };
-            buttonCancel.Click += ButtonCancel_Click;
+			buttonQuery = new Button { Text = "Query", Location = new Point(80, 160), Width = 100 };
+			buttonQuery.Click += ButtonQuery_Click;
 
-            buttonSaveCsv = new Button { Text = "Save to CSV", Location = new Point(300, 160), Width = 120, Enabled = false };
-            buttonSaveCsv.Click += ButtonSaveCsv_Click;
+			buttonCancel = new Button { Text = "Cancel", Location = new Point(190, 160), Width = 100, Enabled = false };
+			buttonCancel.Click += ButtonCancel_Click;
 
-            listViewCampaigns = new ListView
-            {
-                View = View.Details,
-                FullRowSelect = true,
-                GridLines = true,
-                Anchor = AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right, // Anchor left and bottom
-            };
-            listViewCampaigns.Columns.Add("StartDate", 140);
-            listViewCampaigns.Columns.Add("EndDate", 140);
-            listViewCampaigns.Columns.Add("VesselId", 70);
-            listViewCampaigns.Columns.Add("NumScans", 70);
-            listViewCampaigns.Columns.Add("FirstScan", 100);
-            listViewCampaigns.Columns.Add("LastScan", 100);
-            listViewCampaigns.Columns.Add("Heats", 70);
+			buttonSaveCsv = new Button { Text = "Save to CSV", Location = new Point(300, 160), Width = 120, Enabled = false };
+			buttonSaveCsv.Click += ButtonSaveCsv_Click;
 
-            Controls.Add(labelServer);
-            Controls.Add(labelVessel);
-            Controls.Add(labelDateStart);
-            Controls.Add(labelDateEnd);
-            Controls.Add(labelDb);
-            Controls.Add(textBoxServer);
-            Controls.Add(textBoxVessel);
-            Controls.Add(textBoxDateStart);
-            Controls.Add(textBoxDateEnd);
-            Controls.Add(textBoxDb);
-            Controls.Add(buttonQuery);
-            Controls.Add(buttonCancel);
-            Controls.Add(buttonSaveCsv);
-            Controls.Add(listViewCampaigns);
+			textBoxFilterString = new TextBox
+			{
+				Location = new Point(10, buttonQuery.Bottom + 5),
+				Width = this.Width - 20,
+				ReadOnly = true,
+				Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top
+			};
+			Controls.Add(textBoxFilterString);
 
-            // Set up layout in the parent control's Resize event
-            this.Resize += (s, e) =>
-            {
-                int topOfList = buttonQuery.Bottom + 10;
-                int listWidth = this.Width / 2;
-                int listHeight = this.Height - topOfList - 10;
-                listViewCampaigns.SetBounds(10, topOfList, listWidth, listHeight);
+			listViewCampaigns = new ListView
+			{
+				View = View.Details,
+				FullRowSelect = true,
+				GridLines = true,
+				Anchor = AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right, // Anchor left and bottom
+			};
+			listViewCampaigns.Columns.Add("StartDate", 140);
+			listViewCampaigns.Columns.Add("EndDate", 140);
+			listViewCampaigns.Columns.Add("VesselId", 70);
+			listViewCampaigns.Columns.Add("NumScans", 70);
+			listViewCampaigns.Columns.Add("FirstScan", 100);
+			listViewCampaigns.Columns.Add("LastScan", 100);
+			listViewCampaigns.Columns.Add("Heats", 70);
 
-                // Optionally, keep Save button aligned with others
-                buttonSaveCsv.Top = buttonQuery.Top;
-                buttonSaveCsv.Left = buttonCancel.Right + 10;
-            };
+			Controls.Add(labelServer);
+			Controls.Add(labelVessel);
+			Controls.Add(labelDateStart);
+			Controls.Add(labelDateEnd);
+			Controls.Add(labelDb);
+			Controls.Add(textBoxServer);
+			Controls.Add(textBoxVessel);
+			Controls.Add(textBoxDateStart);
+			Controls.Add(textBoxDateEnd);
+			Controls.Add(textBoxDb);
+			Controls.Add(buttonQuery);
+			Controls.Add(buttonCancel);
+			Controls.Add(buttonSaveCsv);
+			Controls.Add(listViewCampaigns);
 
-            // Initial layout
-            int initialTopOfList = buttonQuery.Bottom + 10;
-            int initialListWidth = this.Width / 2;
-            int initialListHeight = this.Height - initialTopOfList - 10;
-            listViewCampaigns.SetBounds(10, initialTopOfList, initialListWidth, initialListHeight);
+			// Layout method for both initial and resize
+			Action layoutControls = () =>
+			{
+				int topOfList = textBoxFilterString.Bottom + 5;
+				int listWidth = this.Width / 2;
+				int listHeight = this.Height - topOfList - 10;
+				listViewCampaigns.SetBounds(10, topOfList, listWidth, listHeight);
 
-            LoadSettings();
-        }
+				// Optionally, keep Save button aligned with others
+				buttonSaveCsv.Top = buttonQuery.Top;
+				buttonSaveCsv.Left = buttonCancel.Right + 10;
+
+				textBoxFilterString.Width = 800;
+				textBoxFilterString.Top = buttonQuery.Bottom + 5;
+			};
+
+			// Set up layout in the parent control's Resize event
+			this.Resize += (s, e) => layoutControls();
+
+			// Initial layout
+			layoutControls();
+
+			textBoxServer.TextChanged += (s, e) => UpdateFilterString();
+			textBoxVessel.TextChanged += (s, e) => UpdateFilterString();
+			checkBoxIncludeVessel.CheckedChanged += (s, e) => UpdateFilterString();
+			textBoxDateStart.TextChanged += (s, e) => UpdateFilterString();
+			textBoxDateEnd.TextChanged += (s, e) => UpdateFilterString();
+			textBoxDb.TextChanged += (s, e) => UpdateFilterString();
+
+			LoadSettings();
+			UpdateFilterString();
+		}
 
         async void ButtonQuery_Click(object sender, EventArgs e)
         {
@@ -135,7 +167,7 @@ namespace DVISApi
                 url.Append("http://").Append(server).Append("/api/laser/campaigns");
 
                 var parameters = new List<string>();
-                if (!string.IsNullOrEmpty(vessel))
+                if (checkBoxIncludeVessel.Checked && !string.IsNullOrWhiteSpace(vessel))
                     parameters.Add("vessel=" + Uri.EscapeDataString(vessel));
                 if (!string.IsNullOrEmpty(dateStart))
                     parameters.Add("dateStart=" + Uri.EscapeDataString(dateStart));
@@ -154,9 +186,21 @@ namespace DVISApi
                     var response = await client.GetAsync(url.ToString(), _cts.Token);
                     response.EnsureSuccessStatusCode();
                     var csv = await response.Content.ReadAsStringAsync();
-                    int rowCount = DisplayCampaigns(csv);
-                    sw.Stop();
-                    OnMessage(string.Format("Retrieved {0} rows in {1:0.00} seconds", rowCount, sw.Elapsed.TotalSeconds));
+
+                    // Check for error message instead of CSV
+                    if (!IsCsvData(csv))
+                    {
+                        _lastCsvResult = null;
+                        buttonSaveCsv.Enabled = false;
+                        listViewCampaigns.Items.Clear();
+                        OnMessage(csv.Trim());
+                    }
+                    else
+                    {
+                        int rowCount = DisplayCampaigns(csv);
+                        sw.Stop();
+                        OnMessage(string.Format("Retrieved {0} rows in {1:0.00} seconds", rowCount, sw.Elapsed.TotalSeconds));
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -172,6 +216,19 @@ namespace DVISApi
                 EnableAllControls();
                 buttonCancel.Enabled = false;
                 _cts = null;
+            }
+        }
+
+        // Add this helper method to your class
+        private bool IsCsvData(string data)
+        {
+            if (string.IsNullOrWhiteSpace(data)) return false;
+			if (data.ToLower().Contains("Exception")) return false;
+			// Heuristic: CSV should have at least one comma in the header line
+			using (var reader = new StringReader(data))
+            {
+                string header = reader.ReadLine();
+                return header != null && header.Contains(",");
             }
         }
 
@@ -311,6 +368,34 @@ namespace DVISApi
                     }
                 }
             }
+        }
+
+        void UpdateFilterString()
+        {
+            string server = textBoxServer.Text.Trim();
+            if (string.IsNullOrEmpty(server))
+            {
+                textBoxFilterString.Text = "";
+                return;
+            }
+
+            var url = new StringBuilder();
+            url.Append("http://").Append(server).Append("/api/laser/campaigns");
+
+            var parameters = new List<string>();
+            if (checkBoxIncludeVessel.Checked && !string.IsNullOrWhiteSpace(textBoxVessel.Text))
+                parameters.Add("vessel=" + Uri.EscapeDataString(textBoxVessel.Text.Trim()));
+            if (!string.IsNullOrWhiteSpace(textBoxDateStart.Text))
+                parameters.Add("dateStart=" + Uri.EscapeDataString(textBoxDateStart.Text.Trim()));
+            if (!string.IsNullOrWhiteSpace(textBoxDateEnd.Text))
+                parameters.Add("dateEnd=" + Uri.EscapeDataString(textBoxDateEnd.Text.Trim()));
+            if (!string.IsNullOrWhiteSpace(textBoxDb.Text))
+                parameters.Add("db=" + Uri.EscapeDataString(textBoxDb.Text.Trim()));
+
+            if (parameters.Count > 0)
+                url.Append("?").Append(string.Join("&", parameters));
+
+            textBoxFilterString.Text = url.ToString();
         }
 
         class ListViewItemComparer : System.Collections.IComparer
