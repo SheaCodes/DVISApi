@@ -12,19 +12,7 @@ namespace DVISApi
     public partial class LaserStatsControl : UserControl
     {
         readonly Action<string> _onMsg;
-        TextBox textBoxServer;
-        TextBox textBoxVessel;
-        TextBox textBoxDateStart;
-        TextBox textBoxDateEnd;
-        TextBox textBoxDb;
-        ComboBox comboBoxStat;
-        Button buttonQuery;
-        Button buttonCancel;
-        Button buttonSaveCsv;
-        ListView listViewStats;
-        Label labelServer, labelVessel, labelDateStart, labelDateEnd, labelDb, labelStat;
-        CheckBox checkBoxIncludeVessel;
-        TextBox textBoxFilterString;
+
 
         CancellationTokenSource _cts;
         int _sortColumn = -1;
@@ -35,97 +23,12 @@ namespace DVISApi
         {
             _onMsg = onMsg;
             InitializeComponent();
-            InitializeCustomControls();
+            InitializeAdditionalComponents();
             listViewStats.ColumnClick += ListViewStats_ColumnClick;
         }
 
-        void InitializeCustomControls()
+        void InitializeAdditionalComponents()
         {
-            labelServer = new Label { Text = "Server", Location = new Point(10, 10), AutoSize = true };
-            labelVessel = new Label { Text = "Vessel", Location = new Point(10, 40), AutoSize = true };
-            labelDateStart = new Label { Text = "Date Start", Location = new Point(10, 70), AutoSize = true };
-            labelDateEnd = new Label { Text = "Date End", Location = new Point(10, 100), AutoSize = true };
-            labelDb = new Label { Text = "DB", Location = new Point(10, 130), AutoSize = true };
-            labelStat = new Label { Text = "Stat", Location = new Point(10, 160), AutoSize = true };
-
-            textBoxServer = new TextBox { Location = new Point(80, 10), Width = 200, Text = "10.28.13.71:5123" };
-            textBoxVessel = new TextBox { Location = new Point(80, 40), Width = 200 };
-            textBoxDateStart = new TextBox { Location = new Point(80, 70), Width = 200 };
-            textBoxDateEnd = new TextBox { Location = new Point(80, 100), Width = 200 };
-            textBoxDb = new TextBox { Location = new Point(80, 130), Width = 200 };
-
-            comboBoxStat = new ComboBox
-            {
-                Location = new Point(80, 160),
-                Width = 200,
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
-            comboBoxStat.Items.AddRange(new string[] {
-                "Average",
-                "Average10cmCylinderThinnestMargin",
-                "Average10cmCylinderThickestMargin",
-                "Average10cmCylinder",
-                "AverageMax10cmCylinder",
-                "EntireRegionAverageMargin",
-                "ThinnestPointMargin",
-                "NumPointsInRegion",
-                "PercentCoverage"
-            });
-            if (comboBoxStat.Items.Count > 0)
-                comboBoxStat.SelectedIndex = 0;
-
-            checkBoxIncludeVessel = new CheckBox
-            {
-                Text = "Include",
-                Location = new Point(textBoxVessel.Right + 5, textBoxVessel.Top + 2),
-                AutoSize = true,
-                Checked = true
-            };
-            Controls.Add(checkBoxIncludeVessel);
-
-            buttonQuery = new Button { Text = "Query", Location = new Point(80, 190), Width = 100 };
-            buttonQuery.Click += ButtonQuery_Click;
-
-            buttonCancel = new Button { Text = "Cancel", Location = new Point(190, 190), Width = 100, Enabled = false };
-            buttonCancel.Click += ButtonCancel_Click;
-
-            buttonSaveCsv = new Button { Text = "Save to CSV", Location = new Point(300, 190), Width = 120, Enabled = false };
-            buttonSaveCsv.Click += ButtonSaveCsv_Click;
-
-            textBoxFilterString = new TextBox
-            {
-                Location = new Point(10, buttonQuery.Bottom + 5),
-                Width = this.Width - 20,
-                ReadOnly = true,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top
-            };
-            Controls.Add(textBoxFilterString);
-
-            listViewStats = new ListView
-            {
-                View = View.Details,
-                FullRowSelect = true,
-                GridLines = true,
-                Anchor = AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right
-            };
-
-            Controls.Add(labelServer);
-            Controls.Add(labelVessel);
-            Controls.Add(labelDateStart);
-            Controls.Add(labelDateEnd);
-            Controls.Add(labelDb);
-            Controls.Add(labelStat);
-            Controls.Add(textBoxServer);
-            Controls.Add(textBoxVessel);
-            Controls.Add(textBoxDateStart);
-            Controls.Add(textBoxDateEnd);
-            Controls.Add(textBoxDb);
-            Controls.Add(comboBoxStat);
-            Controls.Add(buttonQuery);
-            Controls.Add(buttonCancel);
-            Controls.Add(buttonSaveCsv);
-            Controls.Add(listViewStats);
-
             Action layoutControls = () =>
             {
                 int topOfList = textBoxFilterString.Bottom + 5;
