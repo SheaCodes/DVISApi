@@ -75,6 +75,12 @@
     <Compile Include="LaserStatsControl.Designer.cs">
       <DependentUpon>LaserStatsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="LaserVolumesControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LaserVolumesControl.Designer.cs">
+      <DependentUpon>LaserVolumesControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TSPointWebIterator.cs" />

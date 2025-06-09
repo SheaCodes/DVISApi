@@ -36,6 +36,9 @@ namespace DVISApi
 			var statsControl = new LaserStatsControl(OnMessage);
 			statsControl.Dock = DockStyle.Fill;
 			tabPageLaserStats.Controls.Add(statsControl);
+                        var volumesControl = new LaserVolumesControl(OnMessage);
+                        volumesControl.Dock = DockStyle.Fill;
+                        tabPageLaserVolumes.Controls.Add(volumesControl);
 
 
 			listViewContextMenu = new ContextMenuStrip();
