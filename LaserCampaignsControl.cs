@@ -33,6 +33,9 @@ namespace DVISApi
         CheckBox checkBoxIncludeVessel;
         TextBox textBoxFilterString;
 
+        // Add this field to your class (with the other controls)
+        CheckBox checkBoxIncludeDb;
+
         public LaserCampaignsControl(Action<string> onMsg)
         {
 	        _onMsg = onMsg;
@@ -64,6 +67,15 @@ namespace DVISApi
 				Checked = true
 			};
 			Controls.Add(checkBoxIncludeVessel);
+
+			checkBoxIncludeDb = new CheckBox
+			{
+				Text = "Include",
+				Location = new Point(textBoxDb.Right + 5, textBoxDb.Top + 2),
+				AutoSize = true,
+				Checked = true
+			};
+			Controls.Add(checkBoxIncludeDb);
 
 			buttonQuery = new Button { Text = "Query", Location = new Point(80, 160), Width = 100 };
 			buttonQuery.Click += ButtonQuery_Click;
@@ -141,6 +153,7 @@ namespace DVISApi
 			textBoxDateStart.TextChanged += (s, e) => UpdateFilterString();
 			textBoxDateEnd.TextChanged += (s, e) => UpdateFilterString();
 			textBoxDb.TextChanged += (s, e) => UpdateFilterString();
+			checkBoxIncludeDb.CheckedChanged += (s, e) => UpdateFilterString();
 
 			LoadSettings();
 			UpdateFilterString();
@@ -173,7 +186,7 @@ namespace DVISApi
                     parameters.Add("dateStart=" + Uri.EscapeDataString(dateStart));
                 if (!string.IsNullOrEmpty(dateEnd))
                     parameters.Add("dateEnd=" + Uri.EscapeDataString(dateEnd));
-                if (!string.IsNullOrEmpty(db))
+                if (checkBoxIncludeDb.Checked && !string.IsNullOrWhiteSpace(db))
                     parameters.Add("db=" + Uri.EscapeDataString(db));
 
                 if (parameters.Count > 0)
@@ -389,7 +402,7 @@ namespace DVISApi
                 parameters.Add("dateStart=" + Uri.EscapeDataString(textBoxDateStart.Text.Trim()));
             if (!string.IsNullOrWhiteSpace(textBoxDateEnd.Text))
                 parameters.Add("dateEnd=" + Uri.EscapeDataString(textBoxDateEnd.Text.Trim()));
-            if (!string.IsNullOrWhiteSpace(textBoxDb.Text))
+            if (checkBoxIncludeDb.Checked && !string.IsNullOrWhiteSpace(textBoxDb.Text))
                 parameters.Add("db=" + Uri.EscapeDataString(textBoxDb.Text.Trim()));
 
             if (parameters.Count > 0)
