@@ -80,6 +80,7 @@
 			this.columnHeaderMsg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.tabPageLaserStats = new System.Windows.Forms.TabPage();
+                        this.tabPageLaserVolumes = new System.Windows.Forms.TabPage();
 			this.groupBox1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
@@ -142,6 +143,7 @@
 			this.tabControl1.Controls.Add(this.tabPage4);
 			this.tabControl1.Controls.Add(this.tabPageLaserCampaigns);
 			this.tabControl1.Controls.Add(this.tabPageLaserStats);
+                        this.tabControl1.Controls.Add(this.tabPageLaserVolumes);
 			this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tabControl1.Location = new System.Drawing.Point(2, 30);
 			this.tabControl1.Margin = new System.Windows.Forms.Padding(7);
@@ -661,6 +663,13 @@
 			this.tabPageLaserStats.TabIndex = 5;
 			this.tabPageLaserStats.Text = "Laser Stats";
 			this.tabPageLaserStats.UseVisualStyleBackColor = true;
+                        // tabPageLaserVolumes
+                        this.tabPageLaserVolumes.Location = new System.Drawing.Point(8, 43);
+                        this.tabPageLaserVolumes.Name = "tabPageLaserVolumes";
+                        this.tabPageLaserVolumes.Size = new System.Drawing.Size(3061, 1371);
+                        this.tabPageLaserVolumes.TabIndex = 6;
+                        this.tabPageLaserVolumes.Text = "Laser Volumes";
+                        this.tabPageLaserVolumes.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -743,6 +752,7 @@
 		private System.Windows.Forms.Button buttonCancelPostImage;
 		private System.Windows.Forms.TabPage tabPageLaserCampaigns;
 		private System.Windows.Forms.TabPage tabPageLaserStats;
+                private System.Windows.Forms.TabPage tabPageLaserVolumes;
 	}
 }
 

@@ -278,6 +278,61 @@ namespace DVISApi.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserVolumesServer {
+            get {
+                return ((string)(this["LaserVolumesServer"]));
+            }
+            set {
+                this["LaserVolumesServer"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserVolumesVessel {
+            get {
+                return ((string)(this["LaserVolumesVessel"]));
+            }
+            set {
+                this["LaserVolumesVessel"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserVolumesDateStart {
+            get {
+                return ((string)(this["LaserVolumesDateStart"]));
+            }
+            set {
+                this["LaserVolumesDateStart"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserVolumesDateEnd {
+            get {
+                return ((string)(this["LaserVolumesDateEnd"]));
+            }
+            set {
+                this["LaserVolumesDateEnd"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LaserVolumesDb {
+            get {
+                return ((string)(this["LaserVolumesDb"]));
+            }
+            set {
+                this["LaserVolumesDb"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string PostImageFile {
             get {
                 return ((string)(this["PostImageFile"]));
