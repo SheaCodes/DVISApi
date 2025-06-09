@@ -29,11 +29,16 @@ namespace DVISApi
 
 			LoadSettings();
 
-			var statsControl = new LaserCampaignsControl(OnMessage);
-			statsControl.Dock = DockStyle.Fill;
-			tabPage5.Controls.Add(statsControl);
+			var campaignsControl = new LaserCampaignsControl(OnMessage);
+			campaignsControl.Dock = DockStyle.Fill;
+			tabPageLaserCampaigns.Controls.Add(campaignsControl);
 
-            listViewContextMenu = new ContextMenuStrip();
+			var statsControl = new LaserStatsControl(OnMessage);
+			statsControl.Dock = DockStyle.Fill;
+			tabPageLaserStats.Controls.Add(statsControl);
+
+
+			listViewContextMenu = new ContextMenuStrip();
             copyMenuItem = new ToolStripMenuItem("Copy", null, OnCopyListViewItems);
             listViewContextMenu.Items.Add(copyMenuItem);
             listView1.ContextMenuStrip = listViewContextMenu;

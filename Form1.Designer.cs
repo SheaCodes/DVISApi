@@ -74,11 +74,12 @@
 			this.buttonChooseImage = new System.Windows.Forms.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.buttonGoPostImage = new System.Windows.Forms.Button();
-			this.tabPage5 = new System.Windows.Forms.TabPage();
+			this.tabPageLaserCampaigns = new System.Windows.Forms.TabPage();
 			this.listView1 = new System.Windows.Forms.ListView();
 			this.columnHeaderTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeaderMsg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.tabPageLaserStats = new System.Windows.Forms.TabPage();
 			this.groupBox1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
@@ -139,7 +140,8 @@
 			this.tabControl1.Controls.Add(this.tabPage2);
 			this.tabControl1.Controls.Add(this.tabPage3);
 			this.tabControl1.Controls.Add(this.tabPage4);
-			this.tabControl1.Controls.Add(this.tabPage5);
+			this.tabControl1.Controls.Add(this.tabPageLaserCampaigns);
+			this.tabControl1.Controls.Add(this.tabPageLaserStats);
 			this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tabControl1.Location = new System.Drawing.Point(2, 30);
 			this.tabControl1.Margin = new System.Windows.Forms.Padding(7);
@@ -602,12 +604,12 @@
 			// 
 			// tabPage5
 			// 
-			this.tabPage5.Location = new System.Drawing.Point(8, 43);
-			this.tabPage5.Name = "tabPage5";
-			this.tabPage5.Size = new System.Drawing.Size(3061, 1371);
-			this.tabPage5.TabIndex = 4;
-			this.tabPage5.Text = "Laser Campaigns";
-			this.tabPage5.UseVisualStyleBackColor = true;
+			this.tabPageLaserCampaigns.Location = new System.Drawing.Point(8, 43);
+			this.tabPageLaserCampaigns.Name = "tabPageLaserCampaigns";
+			this.tabPageLaserCampaigns.Size = new System.Drawing.Size(3061, 1371);
+			this.tabPageLaserCampaigns.TabIndex = 4;
+			this.tabPageLaserCampaigns.Text = "Laser Campaigns";
+			this.tabPageLaserCampaigns.UseVisualStyleBackColor = true;
 			// 
 			// listView1
 			// 
@@ -650,6 +652,15 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 300F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(3085, 1758);
 			this.tableLayoutPanel1.TabIndex = 5;
+			// 
+			// tabPageLaserStats
+			// 
+			this.tabPageLaserStats.Location = new System.Drawing.Point(8, 43);
+			this.tabPageLaserStats.Name = "tabPageLaserStats";
+			this.tabPageLaserStats.Size = new System.Drawing.Size(3061, 1371);
+			this.tabPageLaserStats.TabIndex = 5;
+			this.tabPageLaserStats.Text = "Laser Stats";
+			this.tabPageLaserStats.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -730,7 +741,8 @@
 		private System.Windows.Forms.Button buttonChooseImage;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Button buttonCancelPostImage;
-		private System.Windows.Forms.TabPage tabPage5;
+		private System.Windows.Forms.TabPage tabPageLaserCampaigns;
+		private System.Windows.Forms.TabPage tabPageLaserStats;
 	}
 }
 
