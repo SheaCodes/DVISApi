@@ -146,17 +146,7 @@ namespace DVISApi
             this.textBoxDb.Size = new System.Drawing.Size(200, 23);
             this.textBoxDb.TabIndex = 10;
             // 
-            // 
-                "Average",
-                "Average10cmCylinderThinnestMargin",
-                "Average10cmCylinderThickestMargin",
-                "Average10cmCylinder",
-                "AverageMax10cmCylinder",
-                "EntireRegionAverageMargin",
-                "ThinnestPointMargin",
-                "NumPointsInRegion",
-                "PercentCoverage"});
-            // 
+
             // checkBoxIncludeVessel
             // 
             this.checkBoxIncludeVessel.AutoSize = true;
